@@ -1,0 +1,26 @@
+.RomanistHere__icon {
+    display: inline-block;
+
+    width: 20px;
+    height: 20px;
+
+    background-color: black;
+    border-radius: 50%;
+}
+
+.RomanistHere__textarea {
+    position: absolute;
+    display: none;
+
+    top: 0;
+    right: -195px;
+    width: 200px;
+    height: 200px;
+
+    background-color: #fff;
+}
+
+.RomanistHere__icon:hover + .RomanistHere__textarea,
+.RomanistHere__textarea:hover {
+    display: block;
+}
