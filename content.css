@@ -19,6 +19,10 @@
     background-color: #0a66c2;
 }
 
+.RomanistHere__icon-marked {
+    border-width: 5px;
+}
+
 .RomanistHere__wrap {
     position: absolute;
     display: none;

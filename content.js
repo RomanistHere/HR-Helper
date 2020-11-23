@@ -23,6 +23,7 @@ const getTextArea = (url) => `
         <a href="#" data-url="${url}" class="RomanistHere__link RomanistHere__link_remove RomanistHere__link-right RomanistHere__link-dis">Clear</a>
     </form>
 `
+
 const switchModeToFill = item => {
     const remove = item.querySelector('.RomanistHere__link_remove')
     const save = item.querySelector('.RomanistHere__btn')
@@ -39,6 +40,16 @@ const fillText = (item, text) => {
     textArea.value = text
     item.querySelector('.RomanistHere__icon').classList.add('RomanistHere__icon-filled')
     switchModeToFill(item)
+}
+
+const fillItem = (item, data) => {
+    if (data.text) {
+        fillText(item, data.text)
+    } else if (data.marked) {
+        item.querySelector('.RomanistHere__icon').classList.add('RomanistHere__icon-marked')
+        item.querySelector('.RomanistHere__link_mark').classList.add('RomanistHere__link-dis')
+        item.querySelector('.RomanistHere__link_remove').classList.remove('RomanistHere__link-dis')
+    }
 }
 
 const fixArea = (e, formWrap) => {
@@ -70,16 +81,44 @@ const removeItem = (e, url, textArea, formWrap, item) => {
     closeForm(e, item, formWrap, false)
 }
 
+// model
+// {
+//     itemName: string,
+//     text: string,
+//     date: string,
+//     marked: boolean,
+//     // later
+//     userName: string,
+//     userEmail: string,
+//     userWork: string,
+// }
+
 const saveChanges = (e, url, textArea, formWrap, item) => {
-    const newText = textArea.value
+    const newItem = {
+        text: textArea.value,
+        date: new Date().toLocaleDateString(),
+        marked: false,
+        itemName: item.querySelector('.name.actor-name').textContent
+    }
 
     chrome.storage.sync.get(['data'], resp => {
         const { data } = resp
-        const newData = { ...data, [url]: newText }
+        const newData = { ...data, [url]: newItem }
         chrome.storage.sync.set({ data: newData })
     })
 
     closeForm(e, item, formWrap, true)
+}
+
+const markItem = (e, url, formWrap, item) => {
+    chrome.storage.sync.get(['data'], resp => {
+        const { data } = resp
+        const newData = { ...data, [url]: { marked: true } }
+        chrome.storage.sync.set({ data: newData })
+    })
+
+    item.querySelector('.RomanistHere__icon').classList.add('RomanistHere__icon-marked')
+    closeForm(e, item, formWrap, false)
 }
 
 const appendElements = (item, url) => {
@@ -109,6 +148,8 @@ const appendElements = (item, url) => {
     btn.addEventListener('click', e => saveChanges(e, url, textArea, formWrap, item))
     remove.addEventListener('click', e => removeItem(e, url, textArea, formWrap, item))
     close.addEventListener('click', e => closeForm(e, item, formWrap, false))
+    mark.addEventListener('click', e => markItem(e, url, formWrap, item))
+
     textArea.addEventListener('input', e => { switchModeToFill(item) })
 
     item.classList.add('RomanistHere-filled')
@@ -127,7 +168,7 @@ const updInfo = () => {
             appendElements(item, url)
 
             if (url in data) {
-                fillText(item, data[url])
+                fillItem(item, data[url])
             }
         })
     })
