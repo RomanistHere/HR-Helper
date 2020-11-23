@@ -1,3 +1,6 @@
+
+
+// handle open option page request from "expand"
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.message == 'openOptPage') {
         const curOptionsUrl = chrome.extension.getURL('options/options.html')
