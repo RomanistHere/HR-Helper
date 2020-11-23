@@ -18,16 +18,27 @@ const getTextArea = (url) => `
         <a href="#" class="RomanistHere__link RomanistHere__link_close">X</a>
         <textarea class="RomanistHere__textarea"></textarea>
         <a href="#" data-url="${url}" class="RomanistHere__link RomanistHere__link-left RomanistHere__link_expand">Expand</a>
-        <a href="#" data-url="${url}" class="RomanistHere__link RomanistHere__link-middle RomanistHere__link_mark RomanistHere__link-dis">Mark</a>
-        <a href="#" data-url="${url}" class="RomanistHere__link RomanistHere__btn RomanistHere__link-middle">Save</a>
-        <a href="#" data-url="${url}" class="RomanistHere__link RomanistHere__link_remove RomanistHere__link-right">Remove</a>
+        <a href="#" data-url="${url}" class="RomanistHere__link RomanistHere__link-middle RomanistHere__link_mark">Mark</a>
+        <a href="#" data-url="${url}" class="RomanistHere__link RomanistHere__link-middle RomanistHere__link-dis RomanistHere__btn">Save</a>
+        <a href="#" data-url="${url}" class="RomanistHere__link RomanistHere__link_remove RomanistHere__link-right RomanistHere__link-dis">Clear</a>
     </form>
 `
+const switchModeToFill = item => {
+    const remove = item.querySelector('.RomanistHere__link_remove')
+    const save = item.querySelector('.RomanistHere__btn')
+    const mark = item.querySelector('.RomanistHere__link_mark')
+
+    remove.classList.remove('RomanistHere__link-dis')
+    save.classList.remove('RomanistHere__link-dis')
+    mark.classList.add('RomanistHere__link-dis')
+}
 
 const fillText = (item, text) => {
     const textArea = item.querySelector('.RomanistHere__textarea')
+
     textArea.value = text
     item.querySelector('.RomanistHere__icon').classList.add('RomanistHere__icon-filled')
+    switchModeToFill(item)
 }
 
 const fixArea = (e, formWrap) => {
@@ -98,6 +109,7 @@ const appendElements = (item, url) => {
     btn.addEventListener('click', e => saveChanges(e, url, textArea, formWrap, item))
     remove.addEventListener('click', e => removeItem(e, url, textArea, formWrap, item))
     close.addEventListener('click', e => closeForm(e, item, formWrap, false))
+    textArea.addEventListener('input', e => { switchModeToFill(item) })
 
     item.classList.add('RomanistHere-filled')
 }
