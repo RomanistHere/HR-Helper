@@ -143,6 +143,12 @@ const markItem = (e, url, formWrap, item) => {
     item.querySelector('.RomanistHere__icon').classList.add('RomanistHere__icon-marked')
 }
 
+const openOptPage = (e, url, item, formWrap) => {
+    e.preventDefault()
+    chrome.runtime.sendMessage({ message: 'openOptPage', key: url })
+    closeForm(e, item, formWrap, false)
+}
+
 // add UI to Li
 const appendElements = (item, url) => {
     // wrapper from Li
@@ -179,6 +185,7 @@ const appendElements = (item, url) => {
     remove.addEventListener('click', e => removeItem(e, url, textArea, formWrap, item))
     close.addEventListener('click', e => closeForm(e, item, formWrap, false))
     mark.addEventListener('click', e => markItem(e, url, formWrap, item))
+    expand.addEventListener('click', e => openOptPage(e, url, item, formWrap))
     textArea.addEventListener('input', e => { switchModeToFull(item) })
 
     // mark wrapper as processed
