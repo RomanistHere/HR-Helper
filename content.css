@@ -1,26 +1,97 @@
 .RomanistHere__icon {
     display: inline-block;
+    position: absolute;
 
     width: 20px;
     height: 20px;
+    right: -25px;
+    top: 50%;
+    transform: translateY(-50%);
 
-    background-color: black;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+
+    border: 2px solid #0a66c2;
     border-radius: 50%;
+}
+
+.RomanistHere__icon-filled {
+    background-color: #0a66c2;
+}
+
+.RomanistHere__wrap {
+    position: absolute;
+    display: none;
+    z-index: 1000000000000000000;
+
+    top: 0;
+    right: -220px;
+    width: 200px;
+    height: 150px;
+
+    background-color: #fff;
+
+    border: 2px solid;
+    border-radius: 10px;
+}
+
+.RomanistHere__icon:hover + .RomanistHere__wrap,
+.RomanistHere__wrap:hover,
+.RomanistHere__wrap-show {
+    display: block;
+}
+
+.RomanistHere__form {
+    position: relative;
+
+    height: 100%;
 }
 
 .RomanistHere__textarea {
     position: absolute;
-    display: none;
+    z-index: 1000008;
 
-    top: 0;
-    right: -195px;
-    width: 200px;
-    height: 200px;
+    left: 5px;
+    top: 5px;
+    width: calc(100% - 10px);
+    bottom: 30px;
 
     background-color: #fff;
 }
 
-.RomanistHere__icon:hover + .RomanistHere__textarea,
-.RomanistHere__textarea:hover {
-    display: block;
+.RomanistHere__link {
+    position: absolute;
+
+    bottom: 0;
+    left: 0;
+    padding: 4px 10px;
+
+    text-decoration: none;
+}
+
+.RomanistHere__link:hover {
+    text-decoration: none;
+}
+
+.RomanistHere__link-middle {
+    left: 70px;
+}
+
+.RomanistHere__link-right {
+    left: auto;
+    right: 0;
+}
+
+.RomanistHere__link_close {
+    z-index: 1000000000;
+
+    bottom: auto;
+    top: 5px;
+    right: 5px;
+    left: auto;
+    padding: 0 5px;
+}
+
+.RomanistHere__link-dis {
+    display: none;
 }

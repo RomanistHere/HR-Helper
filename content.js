@@ -13,52 +13,109 @@ const debounce = (func, wait, immediate) => {
 	}
 }
 
+const getTextArea = (url) => `
+    <form action="#" class="RomanistHere__form">
+        <a href="#" class="RomanistHere__link RomanistHere__link_close">X</a>
+        <textarea class="RomanistHere__textarea"></textarea>
+        <a href="#" data-url="${url}" class="RomanistHere__link RomanistHere__link-left RomanistHere__link_expand">Expand</a>
+        <a href="#" data-url="${url}" class="RomanistHere__link RomanistHere__link-middle RomanistHere__link_mark RomanistHere__link-dis">Mark</a>
+        <a href="#" data-url="${url}" class="RomanistHere__link RomanistHere__btn RomanistHere__link-middle">Save</a>
+        <a href="#" data-url="${url}" class="RomanistHere__link RomanistHere__link_remove RomanistHere__link-right">Remove</a>
+    </form>
+`
+
 const fillText = (item, text) => {
     const textArea = item.querySelector('.RomanistHere__textarea')
     textArea.value = text
+    item.querySelector('.RomanistHere__icon').classList.add('RomanistHere__icon-filled')
 }
 
-const appendElements = (item, name) => {
+const fixArea = (e, formWrap) => {
+    e.stopPropagation()
+    e.preventDefault()
+
+    formWrap.classList.add('RomanistHere__wrap-show')
+}
+
+const closeForm = (e, item, formWrap, shouldmark = false) => {
+    e.preventDefault()
+
+    setTimeout(() => {
+        if (shouldmark) item.querySelector('.RomanistHere__icon').classList.add('RomanistHere__icon-filled')
+        formWrap.classList.remove('RomanistHere__wrap-show')
+    }, 50)
+}
+
+const removeItem = (e, url, textArea, formWrap, item) => {
+    textArea.value = ''
+    item.querySelector('.RomanistHere__icon').classList.remove('RomanistHere__icon-filled')
+
+    chrome.storage.sync.get(['data'], resp => {
+        let { data } = resp
+        delete data[url]
+        chrome.storage.sync.set({ data: data })
+    })
+
+    closeForm(e, item, formWrap, false)
+}
+
+const saveChanges = (e, url, textArea, formWrap, item) => {
+    const newText = textArea.value
+
+    chrome.storage.sync.get(['data'], resp => {
+        const { data } = resp
+        const newData = { ...data, [url]: newText }
+        chrome.storage.sync.set({ data: newData })
+    })
+
+    closeForm(e, item, formWrap, true)
+}
+
+const appendElements = (item, url) => {
     const wrapper = item.querySelector('.actor-name-with-distance')
 
     const icon = document.createElement("span")
     icon.classList.add('RomanistHere__icon')
     wrapper.appendChild(icon)
 
-    const textArea = document.createElement("textarea")
-    textArea.classList.add('RomanistHere__textarea')
-    wrapper.appendChild(textArea)
+    const formWrap = document.createElement("div")
+    formWrap.classList.add('RomanistHere__wrap')
+    const formText = getTextArea(url)
+    formWrap.innerHTML = formText
+    wrapper.appendChild(formWrap)
 
-    textArea.addEventListener('click', e => {
-        e.stopPropagation()
-        e.preventDefault()
-    })
+    const btn = item.querySelector('.RomanistHere__btn')
+    const close = item.querySelector('.RomanistHere__link_close')
+    const expand = item.querySelector('.RomanistHere__link_expand')
+    const mark = item.querySelector('.RomanistHere__link_mark')
+    const remove = item.querySelector('.RomanistHere__link_remove')
 
-    textArea.addEventListener('blur', e => {
-        const newText = e.target.value
-        chrome.storage.sync.get(['data'], resp => {
-            const { data } = resp
-            const newData = { ...data, [name]: newText }
-            chrome.storage.sync.set({ data: newData })
-        })
-    })
+    const textArea = item.querySelector('.RomanistHere__textarea')
+
+    icon.addEventListener('click', e => fixArea(e, formWrap))
+    formWrap.addEventListener('click', e => fixArea(e, formWrap))
+
+    btn.addEventListener('click', e => saveChanges(e, url, textArea, formWrap, item))
+    remove.addEventListener('click', e => removeItem(e, url, textArea, formWrap, item))
+    close.addEventListener('click', e => closeForm(e, item, formWrap, false))
 
     item.classList.add('RomanistHere-filled')
 }
 
+const getPureURL = url => url.substring(url.lastIndexOf("/in/") + 4, url.indexOf("/", 8))
+
 const updInfo = () => {
-    console.warn('updinfo')
     chrome.storage.sync.get(['data'], resp => {
         const { data } = resp
         const items = document.querySelectorAll('.search-result.search-result--person:not(.RomanistHere-filled)')
 
         items.forEach(item => {
-            const name = item.querySelector('.name.actor-name').textContent
+            const url = getPureURL(item.querySelector('.search-result__result-link').getAttribute("href"))
 
-            appendElements(item, name)
+            appendElements(item, url)
 
-            if (name in data) {
-                fillText(item, data[name])
+            if (url in data) {
+                fillText(item, data[url])
             }
         })
     })
@@ -66,10 +123,9 @@ const updInfo = () => {
 
 updInfo()
 
-const debUpdInfo = debounce(updInfo, 500)
+const debUpdInfo = debounce(updInfo, 300)
 
 const domObserver = new MutationObserver(mutations => {
-    console.log('mutation')
     debUpdInfo()
 })
 
