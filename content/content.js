@@ -1,5 +1,5 @@
 // get unique url
-const getPureURL = url => url.substring(url.lastIndexOf("/in/") + 4, url.indexOf("/", 8))
+const getPureURL = url => url.substring(url.lastIndexOf("/in/") + 4, url.indexOf("/", url.lastIndexOf("/in/") + 5))
 
 const debounce = (func, wait, immediate) => {
 	var timeout
@@ -16,14 +16,14 @@ const debounce = (func, wait, immediate) => {
 	}
 }
 
-const formTemplate = url =>
+const formTemplate = () =>
     `<form action="#" class="RomanistHere__form">
         <a href="#" class="RomanistHere__link RomanistHere__link_close">X</a>
         <textarea class="RomanistHere__textarea"></textarea>
-        <a href="#" data-url="${url}" class="RomanistHere__link RomanistHere__link-left RomanistHere__link_expand">Expand</a>
-        <a href="#" data-url="${url}" class="RomanistHere__link RomanistHere__link-middle RomanistHere__link_mark">Mark</a>
-        <a href="#" data-url="${url}" class="RomanistHere__link RomanistHere__link-middle RomanistHere__link-dis RomanistHere__btn">Save</a>
-        <a href="#" data-url="${url}" class="RomanistHere__link RomanistHere__link_remove RomanistHere__link-right RomanistHere__link-dis">Clear</a>
+        <a href="#" class="RomanistHere__link RomanistHere__link-left RomanistHere__link_expand">Expand</a>
+        <a href="#" class="RomanistHere__link RomanistHere__link-middle RomanistHere__link_mark">Mark</a>
+        <a href="#" class="RomanistHere__link RomanistHere__link-middle RomanistHere__link-dis RomanistHere__btn">Save</a>
+        <a href="#" class="RomanistHere__link RomanistHere__link_remove RomanistHere__link-right RomanistHere__link-dis">Clear</a>
     </form>`
 
 // textarea is not empty
@@ -122,11 +122,13 @@ const saveToStorage = (key, value) =>
 
 // save item to storage
 const saveChanges = (e, url, textArea, formWrap, item) => {
+	const name = item.innerText.replace('Expand', '').replace('Save', '').replace('Clear', '').replace('/2nd/', '').replace('degree connection', '')
+
     const newItem = {
         text: textArea.value,
         date: new Date().toLocaleDateString(),
         marked: false,
-        itemName: item.querySelector('.name.actor-name').textContent
+        itemName: name
     }
 
     saveToStorage(url, newItem)
@@ -151,17 +153,19 @@ const openOptPage = (e, url, item, formWrap) => {
 
 // add UI to Li
 const appendElements = (item, url) => {
-    // wrapper from Li
-    const wrapper = item.querySelector('.actor-name-with-distance')
+    // create wrapper
+    const wrapper = document.createElement('div')
+	wrapper.classList.add('RomanistHere__wrapper')
+	item.appendChild(wrapper)
 
     // create icon
-    const icon = document.createElement("span")
+    const icon = document.createElement('span')
     icon.classList.add('RomanistHere__icon')
     wrapper.appendChild(icon)
 
     // create form
-    const formWrap = document.createElement("div")
-    const formText = formTemplate(url)
+    const formWrap = document.createElement('div')
+    const formText = formTemplate()
     formWrap.classList.add('RomanistHere__wrap')
     formWrap.innerHTML = formText
     wrapper.appendChild(formWrap)
@@ -178,7 +182,11 @@ const appendElements = (item, url) => {
 
     // state handlers
     icon.addEventListener('click', e => fixArea(e, formWrap))
-    formWrap.addEventListener('click', e => fixArea(e, formWrap))
+	formWrap.addEventListener('click', e => fixArea(e, formWrap))
+	icon.addEventListener('mouseover', e => { e.preventDefault(); e.stopPropagation() })
+	formWrap.addEventListener('mouseover', e => { e.preventDefault(); e.stopPropagation() })
+	icon.addEventListener('mouseenter', e => { e.preventDefault(); e.stopPropagation() })
+    formWrap.addEventListener('mouseenter', e => { e.preventDefault(); e.stopPropagation() })
 
     // form handlers
     submit.addEventListener('click', e => saveChanges(e, url, textArea, formWrap, item))
@@ -196,17 +204,34 @@ const appendElements = (item, url) => {
 const updInfo = () => {
     chrome.storage.sync.get(['data'], resp => {
         const { data } = resp.data ? resp : { data: {} }
-        const items = document.querySelectorAll('.search-result.search-result--person:not(.RomanistHere-filled)')
+		const allLinks = [...document.querySelectorAll('a:not(.RomanistHere-filled):not(.RomanistHere__link)')]
 
-        items.forEach(item => {
-            const url = getPureURL(item.querySelector('.search-result__result-link').getAttribute("href"))
+		if (allLinks.length > 5000) {
+			domObserver.disconnect()
+			// TODO
+			// showErrMess('sorry, something is not working')
+			// sendErr('mutation api 5k+', window.location.href)
+			return
+		}
 
-            appendElements(item, url)
+		const links = allLinks.filter(link =>
+			link.href.includes('in/')
+			&& !link.href.includes('/report/')
+			&& !link.href.includes('/edit/')
+			&& !link.href.includes('/detail')
+			&& !link.innerHTML.includes('RomanistHere__wrapper')
+			&& !link.innerHTML.includes('<img')
+			&& !link.innerHTML.includes('ghost-person'))
 
-            if (url in data) {
+		links.map(item => {
+			const url = getPureURL(item.href)
+
+			appendElements(item, url)
+
+			if (url in data) {
                 fillItem(item, data[url])
             }
-        })
+		})
     })
 }
 
