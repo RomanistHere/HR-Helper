@@ -110,3 +110,8 @@
 .RomanistHere__link-dis {
     display: none;
 }
+
+
+.entity-result__title-line {
+    overflow: visible !important;
+}
