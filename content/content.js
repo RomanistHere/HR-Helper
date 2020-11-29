@@ -224,12 +224,16 @@ const updInfo = () => {
 			&& !link.innerHTML.includes('ghost-person'))
 
 		links.map(item => {
-			const url = getPureURL(item.href)
+			const url = item.href
+			const fixedUrl = url[url.length - 1] == '/' ? url : `${url}/`
+			const key = getPureURL(fixedUrl)
 
-			appendElements(item, url)
+			console.log(key)
 
-			if (url in data) {
-                fillItem(item, data[url])
+			appendElements(item, key)
+
+			if (key in data) {
+                fillItem(item, data[key])
             }
 		})
     })
