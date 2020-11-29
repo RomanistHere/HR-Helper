@@ -228,8 +228,6 @@ const updInfo = () => {
 			const fixedUrl = url[url.length - 1] == '/' ? url : `${url}/`
 			const key = getPureURL(fixedUrl)
 
-			console.log(key)
-
 			appendElements(item, key)
 
 			if (key in data) {
