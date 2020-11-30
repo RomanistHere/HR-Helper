@@ -204,7 +204,20 @@ const appendElements = (item, url) => {
 const updInfo = () => {
     chrome.storage.sync.get(['data'], resp => {
         const { data } = resp.data ? resp : { data: {} }
+		// const messagesPortative = document.querySelectorAll('.msg-overlay-conversation-bubble--header')
+		const myselfCont = document.querySelector('.global-nav__me-content')
+		const messagesPortative = document.querySelectorAll('.msg-overlay-conversation-bubble')
+		const messagesFull = document.querySelectorAll('.msg-thread .msg-s-message-list-container')
 		const allLinks = [...document.querySelectorAll('a:not(.RomanistHere-filled):not(.RomanistHere__link)')]
+
+		const checkParNodeArr = (arr, elem) => {
+			for (let i = 0; i < arr.length; i++) {
+				if (arr[i].contains(elem)) {
+					return true
+				}
+			}
+			return false
+		}
 
 		if (allLinks.length > 5000) {
 			domObserver.disconnect()
@@ -222,13 +235,20 @@ const updInfo = () => {
 			&& !link.href.includes('/edit/')
 			&& !link.href.includes('/detail')
 			&& !link.innerHTML.includes('RomanistHere__wrapper')
-			// && !link.innerHTML.includes('<img')
-			&& !link.innerHTML.includes('ghost-person'))
+			// myself container from top
+			&& (myselfCont ? !myselfCont.contains(link) : true)
+			// if not inside messages
+			&& (messagesPortative.length ? !checkParNodeArr(messagesPortative, link) : true)
+			&& (messagesFull.length ? !checkParNodeArr(messagesFull, link) : true)
+			// only for results page
+			&& (window.location.href.includes('/results/') ? !link.innerHTML.includes('<img') : true)
+			&& (window.location.href.includes('/results/') ? !link.innerHTML.includes('ghost-person') : true))
 
 		links.map(item => {
 			const url = item.href
 			const fixedUrl = url[url.length - 1] == '/' ? url : `${url}/`
 			const key = getPureURL(fixedUrl)
+			console.log(key)
 
 			appendElements(item, key)
 
