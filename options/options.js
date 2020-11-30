@@ -15,6 +15,16 @@ const stringTemplate = (textLeft, textRight, href) =>
 const getName = string =>
     string.trimStart().replace(/[\n\r]/g, ' ').split(' ').slice(0, 2).join(' ')
 
+const objFilter = (obj, condition) => {
+    let newObj = {}
+    for (const [key, value] of Object.entries(obj)) {
+        if (condition(value)) {
+            newObj = { ...newObj, [key]: value }
+        }
+    }
+    return newObj
+}
+
 const clearScreen = () => {
     const table = document.querySelector('.table')
     const marked = document.querySelector('.marked')
@@ -35,8 +45,8 @@ const loadData = query =>
         const marked = document.querySelector('.marked')
 
         for (const [key, value] of Object.entries(data)) {
-            if (query == '')
-                console.log(value)
+            // if (query == '')
+            //     console.log(value)
 
             const name = getName(value.itemName)
 
@@ -70,10 +80,20 @@ document.querySelector('.search__input').addEventListener('keyup', e => {
 
 document.querySelector('.clearMarked').addEventListener('click', e => {
     e.preventDefault()
+
+    chrome.storage.sync.get(['data'], resp => {
+        const newData = objFilter(resp.data, (value) => value.marked === false)
+        // chrome.storage.sync.set({ data: newData })
+    })
 })
 
 document.querySelector('.clearSaved').addEventListener('click', e => {
     e.preventDefault()
+
+    chrome.storage.sync.get(['data'], resp => {
+        const newData = objFilter(resp.data, (value) => value.marked === true)
+        // chrome.storage.sync.set({ data: newData })
+    })
 })
 
 loadData()
