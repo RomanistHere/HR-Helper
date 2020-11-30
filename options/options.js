@@ -2,11 +2,11 @@
 // console.log(query)
 
 const linkTemplate = (href, name) =>
-    `<a class="marked__link" target="_blank" href="https://www.linkedin.com/in/${href}">${name}</a>, `
+    `<a class="marked__link link" target="_blank" href="https://www.linkedin.com/in/${href}/">${name}</a>`
 
 const stringTemplate = (textLeft, textRight, href) =>
     `<div class="table__left">
-        <a class="marked__link" target="_blank" href="https://www.linkedin.com/in/${href}">${textLeft}</a>
+        <a class="table__link link" target="_blank" href="https://www.linkedin.com/in/${href}/">${textLeft}</a>
     </div>
     <div class="table__right">
         ${textRight}

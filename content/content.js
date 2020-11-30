@@ -263,8 +263,10 @@ const updInfo = () => {
     chrome.storage.sync.get(['data'], resp => {
 		if (state.prevUrl !== window.location.href) {
 			state = { ...state, prevUrl: window.location.href }
-			document.querySelector('.RomanistHere__header').remove()
-			document.querySelector('.global-nav').classList.remove('RomanistHere-filled')
+			if (document.querySelector('.RomanistHere__header')) {
+				document.querySelector('.RomanistHere__header').remove()
+				document.querySelector('.global-nav').classList.remove('RomanistHere-filled')
+			}
 		}
 
 		if (!resp.data) {
