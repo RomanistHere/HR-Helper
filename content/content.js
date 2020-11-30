@@ -63,10 +63,8 @@ const fillText = (item, text) => {
 
 // fill item from storage
 const fillItem = (item, data) => {
-	// TODO: when server api ready
 	const formWrap = item.querySelector('.RomanistHere__wrap')
 	if (formWrap && formWrap.classList.contains('RomanistHere__wrap-show')) {
-		console.log('focused')
 		return
 	}
 
