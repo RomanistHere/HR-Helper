@@ -1,4 +1,12 @@
+chrome.runtime.onInstalled.addListener(details => {
+    if (details.reason == 'install') {
 
+    } else if (details.reason == 'update') {
+        chrome.storage.sync.get(['data'], resp => {
+            console.log(resp.data)
+        })
+    }
+})
 
 // handle open option page request from "expand"
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {

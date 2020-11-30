@@ -103,7 +103,11 @@ const removeItem = (e, url, textArea, formWrap, item) => {
     item.querySelector('.RomanistHere__icon').classList.remove('RomanistHere__icon-filled')
 
     chrome.storage.sync.get(['data'], resp => {
-        let { data } = resp.data ? resp : { data: {} }
+		if (!resp.data) {
+			showErrMess('Sorry, something is not working. No data from storage')
+			return
+		}
+        let { data } = resp
         delete data[url]
         chrome.storage.sync.set({ data: data })
     })
@@ -124,16 +128,24 @@ const removeItem = (e, url, textArea, formWrap, item) => {
 //     userWork: string,
 // }
 
+const showErrMess = err => {
+	console.warn(err)
+}
+
 const saveToStorage = (key, value) =>
     chrome.storage.sync.get(['data'], resp => {
-        const { data } = resp.data ? resp : { data: {} }
+		if (!resp.data) {
+			showErrMess('Sorry, something is not working. No data from storage')
+			return
+		}
+        const { data } = resp
         const newData = { ...data, [key]: value }
         chrome.storage.sync.set({ data: newData })
     })
 
 // save item to storage
 const saveChanges = (e, url, textArea, formWrap, item) => {
-	const name = item.innerText.replace('Expand', '').replace('Save', '').replace('Clear', '').replace('/2nd/', '').replace('degree connection', '')
+	const name = item.innerText.replace('Expand', '').replace('Save', '').replace('Clear', '').replace('/2nd/', '').replace('degree connection', '').replace(/[\n\r]/g, '')
 
     const newItem = {
         text: textArea.value,
@@ -148,7 +160,12 @@ const saveChanges = (e, url, textArea, formWrap, item) => {
 
 // save item as marked to storage
 const markItem = (e, url, formWrap, item) => {
-    const newItem = { marked: true }
+	const name = item.innerText.replace('Expand', '').replace('Save', '').replace('Clear', '').replace('/2nd/', '').replace('degree connection', '').replace(/[\n\r]/g, '')
+
+    const newItem = {
+		marked: true,
+		itemName: name
+	}
 
     saveToStorage(url, newItem)
     closeForm(e, item, formWrap, false)
@@ -223,7 +240,11 @@ const checkParNodeArr = (arr, elem) => {
 // get info from storage
 const updInfo = () => {
     chrome.storage.sync.get(['data'], resp => {
-        const { data } = resp.data ? resp : { data: {} }
+		if (!resp.data) {
+			showErrMess('Sorry, something is not working. No data from storage')
+			return
+		}
+        const { data } = resp
 		const myselfCont = document.querySelector('.global-nav__me-content')
 		const invitations = document.querySelector('.mn-invitations-preview')
 		const messagesPortative = document.querySelectorAll('.msg-overlay-conversation-bubble')
@@ -233,7 +254,7 @@ const updInfo = () => {
 		if (allLinks.length > 5000) {
 			domObserver.disconnect()
 			// TODO
-			// showErrMess('sorry, something is not working')
+			showErrMess('Sorry, something is not working. Too much results')
 			// sendErr('mutation api 5k+', window.location.href)
 			return
 		}
