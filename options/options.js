@@ -38,19 +38,21 @@ const loadData = query =>
             if (query == '')
                 console.log(value)
 
-            if (value.marked && key.toLowerCase().includes(query)) {
+            const name = getName(value.itemName)
+
+            if (value.marked && name.toLowerCase().includes(query)) {
                 const linksWrap = document.createElement('span')
-                const name = getName(value.itemName)
                 const link = linkTemplate(key, name)
 
                 linksWrap.innerHTML = link
                 marked.appendChild(linksWrap)
                 continue
+            } else if (value.marked) {
+                continue
             }
 
-            if (key.toLowerCase().includes(query) && value.itemName.toLowerCase().includes(query) && value.text.toLowerCase().includes(query)) {
+            if (key.toLowerCase().includes(query) || name.toLowerCase().includes(query) || value.text.toLowerCase().includes(query)) {
                 const tableWrap = document.createElement('div')
-                const name = getName(value.itemName)
                 const tableCont = stringTemplate(name, value.text, key)
 
                 tableWrap.classList.add('table__string')
@@ -64,6 +66,14 @@ document.querySelector('.search__input').addEventListener('keyup', e => {
     const query = e.target.value
     clearScreen()
     loadData(query.toLowerCase())
+})
+
+document.querySelector('.clearMarked').addEventListener('click', e => {
+    e.preventDefault()
+})
+
+document.querySelector('.clearSaved').addEventListener('click', e => {
+    e.preventDefault()
 })
 
 loadData()
