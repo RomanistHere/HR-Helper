@@ -217,10 +217,12 @@ const updInfo = () => {
 		const links = allLinks.filter(link =>
 			link.href.includes('in/')
 			&& !link.href.includes('/report/')
+			&& !link.href.includes('/linkedin/')
+			&& !link.href.includes('/#')
 			&& !link.href.includes('/edit/')
 			&& !link.href.includes('/detail')
 			&& !link.innerHTML.includes('RomanistHere__wrapper')
-			&& !link.innerHTML.includes('<img')
+			// && !link.innerHTML.includes('<img')
 			&& !link.innerHTML.includes('ghost-person'))
 
 		links.map(item => {
