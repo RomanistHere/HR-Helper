@@ -2,7 +2,10 @@
 // console.log(query)
 
 const linkTemplate = (href, name) =>
-    `<a class="marked__link link" target="_blank" href="https://www.linkedin.com/in/${href}/">${name}</a>`
+    `<a class="marked__link link" target="_blank" href="https://www.linkedin.com/in/${href}/">
+        ${name}
+        <span class="remove" data-key="${href}" href="#">X</span>
+    </a>`
 
 const stringTemplate = (textLeft, textRight, href) =>
     `<div class="table__left">
@@ -10,7 +13,8 @@ const stringTemplate = (textLeft, textRight, href) =>
     </div>
     <div class="table__right">
         ${textRight}
-    </div>`
+    </div>
+    <a class="remove" data-key="${href}" href="#">X</a>`
 
 const getName = string =>
     string.trimStart().replace(/[\n\r]/g, ' ').split(' ').slice(0, 2).join(' ')
@@ -70,6 +74,18 @@ const loadData = query =>
                 table.appendChild(tableWrap)
             }
         }
+
+        document.querySelectorAll('.remove').forEach(item => item.addEventListener('click', e => {
+            e.preventDefault()
+            const elem = e.currentTarget
+            const key = elem.getAttribute('data-key')
+            chrome.storage.sync.get(['data'], resp => {
+                let newData = resp.data
+                delete newData[key]
+                chrome.storage.sync.set({ data: newData })
+                elem.parentNode.remove()
+            })
+        }))
     })
 
 document.querySelector('.search__input').addEventListener('keyup', e => {
@@ -83,8 +99,10 @@ document.querySelector('.clearMarked').addEventListener('click', e => {
 
     chrome.storage.sync.get(['data'], resp => {
         const newData = objFilter(resp.data, (value) => value.marked === false)
-        // chrome.storage.sync.set({ data: newData })
+        chrome.storage.sync.set({ data: newData })
     })
+
+    window.location.reload()
 })
 
 document.querySelector('.clearSaved').addEventListener('click', e => {
@@ -92,8 +110,10 @@ document.querySelector('.clearSaved').addEventListener('click', e => {
 
     chrome.storage.sync.get(['data'], resp => {
         const newData = objFilter(resp.data, (value) => value.marked === true)
-        // chrome.storage.sync.set({ data: newData })
+        chrome.storage.sync.set({ data: newData })
     })
+
+    window.location.reload()
 })
 
 loadData()

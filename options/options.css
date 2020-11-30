@@ -4,6 +4,7 @@ body {
     --sec-bg-col: #dadee0;
     --bg-col: #fff;
     --new-col: #0a66c2;
+    --cross-col: #ca2424;
 
     position: relative;
     width: 100%;
@@ -51,6 +52,7 @@ body {
 }
 
 .marked__link {
+    position: relative;
     display: block;
 
     padding: 10px 20px;
@@ -72,6 +74,18 @@ body {
     color: var(--new-col);
 }
 
+.remove {
+    position: absolute;
+
+    top: 0;
+    right: 6px;
+
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 16px;
+    color: var(--cross-col);
+}
+
 .table {
     display: -webkit-flex;
     display: -ms-flex;
@@ -85,6 +99,7 @@ body {
 }
 
 .table__string {
+    position: relative;
     display: -webkit-flex;
     display: -ms-flex;
     display: flex;
