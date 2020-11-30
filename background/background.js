@@ -4,6 +4,7 @@ chrome.runtime.onInstalled.addListener(details => {
     } else if (details.reason == 'update') {
         chrome.storage.sync.get(['data'], resp => {
             console.log(resp.data)
+            // chrome.storage.sync.set({ 'data': {} })
         })
     }
 })

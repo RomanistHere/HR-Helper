@@ -12,8 +12,10 @@ const stringTemplate = (textLeft, textRight, href) =>
         ${textRight}
     </div>`
 
-const getName = string =>
-    name = string.replace(/[\n\r]/g, ' ').split(' ').slice(0, 2).join(' ')
+const getName = string => {
+    console.log(string)
+    return string.trimStart().replace(/[\n\r]/g, ' ').split(' ').slice(0, 2).join(' ')
+}
 
 chrome.storage.sync.get(['data'], resp => {
     if (!resp.data) {
@@ -25,7 +27,7 @@ chrome.storage.sync.get(['data'], resp => {
     const marked = document.querySelector('.marked')
 
     for (const [key, value] of Object.entries(data)) {
-        console.log(value)
+        // console.log(value)
         if (value.marked) {
             const linksWrap = document.createElement('span')
             const name = getName(value.itemName)

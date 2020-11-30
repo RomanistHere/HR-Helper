@@ -1,3 +1,7 @@
+let state = {
+	prevUrl: window.location.href
+}
+
 // get unique url
 const getPureURL = url => url.substring(url.lastIndexOf("/in/") + 4, url.indexOf("/", url.lastIndexOf("/in/") + 5))
 
@@ -60,11 +64,11 @@ const fillText = (item, text) => {
 // fill item from storage
 const fillItem = (item, data) => {
 	// TODO: when server api ready
-	// const formWrap = item.querySelector('.RomanistHere__wrap')
-	// if (formWrap && formWrap.classList.includes('RomanistHere__wrap-show')) {
-	// 	console.log('focused')
-	// 	return
-	// }
+	const formWrap = item.querySelector('.RomanistHere__wrap')
+	if (formWrap && formWrap.classList.contains('RomanistHere__wrap-show')) {
+		console.log('focused')
+		return
+	}
 
 	if (data == null) {
 		fillText(item, '')
@@ -143,9 +147,25 @@ const saveToStorage = (key, value) =>
         chrome.storage.sync.set({ data: newData })
     })
 
+const getName = string => {
+	// console.log(string)
+	return string.trimStart()
+	.replace('Expand', '')
+	.replace('Save', '')
+	.replace('Member’s name', '')
+	.replace('Clear', '')
+	.replace('Member’s', '')
+	.replace('/2nd/', '')
+	.replace('/1st/', '')
+	.replace('/3rd/', '')
+	.replace('degree connection', '')
+	.replace(/[\n\r]/g, ' ')
+}
+
 // save item to storage
 const saveChanges = (e, url, textArea, formWrap, item) => {
-	const name = item.innerText.replace('Expand', '').replace('Save', '').replace('Clear', '').replace('/2nd/', '').replace('degree connection', '').replace(/[\n\r]/g, '')
+	const header = document.querySelector('.global-nav')
+	const name = header.contains(item) ? document.querySelector('.pv-top-card__photo').getAttribute('title') : getName(item.innerText)
 
     const newItem = {
         text: textArea.value,
@@ -160,7 +180,8 @@ const saveChanges = (e, url, textArea, formWrap, item) => {
 
 // save item as marked to storage
 const markItem = (e, url, formWrap, item) => {
-	const name = item.innerText.replace('Expand', '').replace('Save', '').replace('Clear', '').replace('/2nd/', '').replace('degree connection', '').replace(/[\n\r]/g, '')
+	const header = document.querySelector('.global-nav')
+	const name = header.contains(item) ? document.querySelector('.pv-top-card__photo').getAttribute('title') : getName(item.innerText)
 
     const newItem = {
 		marked: true,
@@ -240,6 +261,12 @@ const checkParNodeArr = (arr, elem) => {
 // get info from storage
 const updInfo = () => {
     chrome.storage.sync.get(['data'], resp => {
+		if (state.prevUrl !== window.location.href) {
+			state = { ...state, prevUrl: window.location.href }
+			document.querySelector('.RomanistHere__header').remove()
+			document.querySelector('.global-nav').classList.remove('RomanistHere-filled')
+		}
+
 		if (!resp.data) {
 			showErrMess('Sorry, something is not working. No data from storage')
 			return
@@ -266,7 +293,6 @@ const updInfo = () => {
 			&& !link.href.includes('/#')
 			&& !link.href.includes('/edit/')
 			&& !link.href.includes('/detail')
-			// && !link.innerHTML.includes('RomanistHere__wrapper')
 			// myself container from top
 			&& (myselfCont ? !myselfCont.contains(link) : true)
 			// invitations
