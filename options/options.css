@@ -59,6 +59,8 @@ body {
     font-size: 24px;
     color: var(--main-col);
     text-decoration: none;
+
+    animation: appear .7s ease;
 }
 
 .link:hover {
@@ -95,6 +97,8 @@ body {
 
     box-shadow: 5px 5px 10px 0 rgba(0,0,0,.75);
     background-color: var(--bg-col);
+
+    animation: appear .7s ease;
 }
 
 .table__left {
@@ -103,4 +107,13 @@ body {
 
     font-weight: bold;
     font-size: 24px;
+}
+
+@keyframes appear {
+    0%, 50% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }
