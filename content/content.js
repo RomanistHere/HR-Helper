@@ -59,6 +59,7 @@ const fillText = (item, text) => {
 
 // fill item from storage
 const fillItem = (item, data) => {
+	// TODO: when server api ready
 	// const formWrap = item.querySelector('.RomanistHere__wrap')
 	// if (formWrap && formWrap.classList.includes('RomanistHere__wrap-show')) {
 	// 	console.log('focused')
@@ -224,6 +225,7 @@ const updInfo = () => {
     chrome.storage.sync.get(['data'], resp => {
         const { data } = resp.data ? resp : { data: {} }
 		const myselfCont = document.querySelector('.global-nav__me-content')
+		const invitations = document.querySelector('.mn-invitations-preview')
 		const messagesPortative = document.querySelectorAll('.msg-overlay-conversation-bubble')
 		const messagesFull = document.querySelectorAll('.msg-thread .msg-s-message-list-container')
 		const allLinks = [...document.querySelectorAll('a:not(.RomanistHere__link)')]
@@ -246,6 +248,9 @@ const updInfo = () => {
 			// && !link.innerHTML.includes('RomanistHere__wrapper')
 			// myself container from top
 			&& (myselfCont ? !myselfCont.contains(link) : true)
+			// invitations
+			&& (invitations && invitations.contains(link) ? !link.innerHTML.includes('<img') : true)
+			&& (invitations && invitations.contains(link) ? !link.innerHTML.includes('ghost-person') : true)
 			// if not inside messages
 			&& (messagesPortative.length ? !checkParNodeArr(messagesPortative, link) : true)
 			&& (messagesFull.length ? !checkParNodeArr(messagesFull, link) : true)
@@ -257,7 +262,7 @@ const updInfo = () => {
 			const url = item.href
 			const fixedUrl = url[url.length - 1] == '/' ? url : `${url}/`
 			const key = getPureURL(fixedUrl)
-			console.log(key)
+			// console.log(key)
 
 			if (!item.innerHTML.includes('RomanistHere__wrapper'))
 				appendElements(item, key)
