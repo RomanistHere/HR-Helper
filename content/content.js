@@ -59,7 +59,17 @@ const fillText = (item, text) => {
 
 // fill item from storage
 const fillItem = (item, data) => {
-    if (data.text) {
+	// const formWrap = item.querySelector('.RomanistHere__wrap')
+	// if (formWrap && formWrap.classList.includes('RomanistHere__wrap-show')) {
+	// 	console.log('focused')
+	// 	return
+	// }
+
+	if (data == null) {
+		fillText(item, '')
+		item.querySelector('.RomanistHere__icon').classList.remove('RomanistHere__icon-filled')
+		switchModeToEmpty(item)
+	} else if (data.text && data.text.length > 0) {
         fillText(item, data.text)
     } else if (data.marked) {
         item.querySelector('.RomanistHere__icon').classList.add('RomanistHere__icon-marked')
@@ -200,24 +210,23 @@ const appendElements = (item, url) => {
     item.classList.add('RomanistHere-filled')
 }
 
+const checkParNodeArr = (arr, elem) => {
+	for (let i = 0; i < arr.length; i++) {
+		if (arr[i].contains(elem)) {
+			return true
+		}
+	}
+	return false
+}
+
 // get info from storage
 const updInfo = () => {
     chrome.storage.sync.get(['data'], resp => {
         const { data } = resp.data ? resp : { data: {} }
-		// const messagesPortative = document.querySelectorAll('.msg-overlay-conversation-bubble--header')
 		const myselfCont = document.querySelector('.global-nav__me-content')
 		const messagesPortative = document.querySelectorAll('.msg-overlay-conversation-bubble')
 		const messagesFull = document.querySelectorAll('.msg-thread .msg-s-message-list-container')
-		const allLinks = [...document.querySelectorAll('a:not(.RomanistHere-filled):not(.RomanistHere__link)')]
-
-		const checkParNodeArr = (arr, elem) => {
-			for (let i = 0; i < arr.length; i++) {
-				if (arr[i].contains(elem)) {
-					return true
-				}
-			}
-			return false
-		}
+		const allLinks = [...document.querySelectorAll('a:not(.RomanistHere__link)')]
 
 		if (allLinks.length > 5000) {
 			domObserver.disconnect()
@@ -234,7 +243,7 @@ const updInfo = () => {
 			&& !link.href.includes('/#')
 			&& !link.href.includes('/edit/')
 			&& !link.href.includes('/detail')
-			&& !link.innerHTML.includes('RomanistHere__wrapper')
+			// && !link.innerHTML.includes('RomanistHere__wrapper')
 			// myself container from top
 			&& (myselfCont ? !myselfCont.contains(link) : true)
 			// if not inside messages
@@ -250,12 +259,30 @@ const updInfo = () => {
 			const key = getPureURL(fixedUrl)
 			console.log(key)
 
-			appendElements(item, key)
+			if (!item.innerHTML.includes('RomanistHere__wrapper'))
+				appendElements(item, key)
 
-			if (key in data) {
-                fillItem(item, data[key])
-            }
+			fillItem(item, data[key])
 		})
+
+		// person page
+		if (window.location.href.includes('linkedin.com/in/')) {
+			const key = getPureURL(window.location.href)
+			const header = document.querySelector('.global-nav')
+
+			if (header.classList.contains('RomanistHere-filled')) {
+				const headerWrap = header.querySelector('.RomanistHere__header')
+				fillItem(headerWrap, data[key])
+				return
+			}
+
+			const wrap = document.createElement('div')
+			wrap.classList.add('RomanistHere__header')
+			header.insertBefore(wrap, header.childNodes[0])
+
+			appendElements(wrap, key)
+			header.classList.add('RomanistHere-filled')
+		}
     })
 }
 

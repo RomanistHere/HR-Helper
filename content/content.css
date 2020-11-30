@@ -1,3 +1,23 @@
+.RomanistHere__header {
+    position: absolute;
+    z-index: 100000000;
+
+    top: 50%;
+    left: 10px;
+    width: 34px;
+    height: 34px;
+    transform: translateY(-50%);
+}
+
+.RomanistHere__header .RomanistHere__wrapper,
+.RomanistHere__header .RomanistHere__wrapper .RomanistHere__icon {
+    width: 100%;
+    height: 100%;
+    transform: none;
+    left: 0;
+    top: 0;
+}
+
 .RomanistHere__wrapper {
     position: relative;
     display: inline-block;
@@ -118,4 +138,8 @@
 .msg-overlay-bubble-header__details,
 .display-flex.flex-column.justify-center.overflow-hidden.pl2 {
     overflow: visible !important;
+}
+
+.msg-entity-lockup__entity-info {
+    max-width: 370px !important;
 }
