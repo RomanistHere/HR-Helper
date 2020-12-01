@@ -2,19 +2,19 @@
 // console.log(query)
 
 const linkTemplate = (href, name) =>
-    `<a class="marked__link link" target="_blank" href="https://www.linkedin.com/in/${href}/">
+    `<a class="marked__link link" title="Open ${name} in the new tab" target="_blank" href="https://www.linkedin.com/in/${href}/">
         ${name}
-        <span class="remove" data-key="${href}" href="#">X</span>
+        <span class="remove" title="Delete" data-key="${href}" href="#">X</span>
+        <span class="moveToSaved" title="Move to saved" data-key="${href}" href="#">⇓</span>
     </a>`
 
-const stringTemplate = (textLeft, textRight, href) =>
+const stringTemplate = (textLeft, href, toUpd = false) =>
     `<div class="table__left">
-        <a class="table__link link" target="_blank" href="https://www.linkedin.com/in/${href}/">${textLeft}</a>
+        <a class="table__link link" title="Open ${textLeft} in the new tab" target="_blank" href="https://www.linkedin.com/in/${href}/">${textLeft}</a>
     </div>
-    <div class="table__right">
-        ${textRight}
-    </div>
-    <a class="remove" data-key="${href}" href="#">X</a>`
+    <textarea class="table__right"></textarea>
+    <a class="remove" title="Delete" data-key="${href}" href="#">X</a>
+    <a class="${toUpd ? 'save' : 'update'}" title="Update and save" data-key="${href}" href="#">${toUpd ? 'Unmark and save' : 'Update'}</a>`
 
 const getName = string =>
     string.trimStart().replace(/[\n\r]/g, ' ').split(' ').slice(0, 2).join(' ')
@@ -60,18 +60,63 @@ const loadData = query =>
 
                 linksWrap.innerHTML = link
                 marked.appendChild(linksWrap)
+
+                // handle moveToSaved button
+                const moveToSaved = linksWrap.querySelector('.moveToSaved')
+                moveToSaved.addEventListener('click', e => {
+                    e.stopPropagation()
+                    e.preventDefault()
+                    e.currentTarget.parentNode.parentNode.remove()
+
+                    const newItem = document.createElement('div')
+                    const itemData = stringTemplate(name, key, true)
+                    newItem.classList.add('table__string')
+                    newItem.innerHTML = itemData
+
+                    table.insertBefore(newItem, table.childNodes[0])
+
+                    // handle textarea
+                    const textArea = newItem.querySelector('.table__right')
+                    textArea.addEventListener('click', e => {
+                        e.currentTarget.parentNode.querySelector('.save').classList.add('update-show')
+                    })
+
+                    const saveBtn = newItem.querySelector('.save')
+                    saveBtn.addEventListener('click', e => {
+                        e.preventDefault()
+                        const newText = textArea.value
+                        chrome.storage.sync.get(['data'], resp => {
+                            const newData = {
+                                ...resp.data,
+                                [key]: {
+                                    ...resp.data[key],
+                                    text: newText,
+                                    marked: false,
+                                }
+                            }
+                            chrome.storage.sync.set({ data: newData })
+                        })
+                    })
+                })
                 continue
             } else if (value.marked) {
                 continue
             }
 
             if (key.toLowerCase().includes(query) || name.toLowerCase().includes(query) || value.text.toLowerCase().includes(query)) {
+                // create and append element
                 const tableWrap = document.createElement('div')
-                const tableCont = stringTemplate(name, value.text, key)
-
+                const tableCont = stringTemplate(name, key)
                 tableWrap.classList.add('table__string')
                 tableWrap.innerHTML = tableCont
                 table.appendChild(tableWrap)
+
+                // handle textarea
+                const textArea = tableWrap.querySelector('.table__right')
+                textArea.value = value.text
+                textArea.addEventListener('click', e => {
+                    e.currentTarget.parentNode.querySelector('.update').classList.add('update-show')
+                })
             }
         }
 
@@ -84,6 +129,17 @@ const loadData = query =>
                 delete newData[key]
                 chrome.storage.sync.set({ data: newData })
                 elem.parentNode.remove()
+            })
+        }))
+
+        document.querySelectorAll('.update').forEach(item => item.addEventListener('click', e => {
+            e.preventDefault()
+            const elem = e.currentTarget
+            const key = elem.getAttribute('data-key')
+            const newVal = elem.parentNode.querySelector('.table__right').value
+            chrome.storage.sync.get(['data'], resp => {
+                const newData = { ...resp.data, [key]: { ...resp.data[key], text: newVal } }
+                chrome.storage.sync.set({ data: newData })
             })
         }))
     })

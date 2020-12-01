@@ -3,7 +3,7 @@ body {
     --main-col: #1b283b;
     --sec-bg-col: #dadee0;
     --bg-col: #fff;
-    --new-col: #0a66c2;
+    --new-col: #0b66c2;
     --cross-col: #ca2424;
 
     position: relative;
@@ -19,7 +19,7 @@ body {
 }
 
 body {
-    padding: 0 40px;
+    padding: 0 40px 40px;
 }
 
 .section {
@@ -62,7 +62,7 @@ body {
     position: relative;
     display: block;
 
-    padding: 10px 20px;
+    padding: 12px 24px;
     margin: 0 10px 10px 0;
     border: 4px solid var(--main-col);
     border-radius: 4px;
@@ -84,13 +84,44 @@ body {
 .remove {
     position: absolute;
 
-    top: 0;
-    right: 6px;
+    top: -2px;
+    right: 0px;
+    padding: 2px 5px;
 
     text-decoration: none;
     font-weight: bold;
     font-size: 16px;
     color: var(--cross-col);
+}
+
+.update,
+.save {
+    position: absolute;
+    display: none;
+
+    left: 20px;
+    bottom: 20px;
+
+    color: var(--main-col);
+    text-decoration: none;
+    font-weight: bold;
+
+    animation: appear .3s ease;
+}
+
+.moveToSaved {
+    position: absolute;
+
+    bottom: -5px;
+    right: -2px;
+    padding: 2px 5px;
+
+    color: var(--new-col);
+    font-weight: bold;
+}
+
+.update-show {
+    display: block;
 }
 
 .table {
@@ -110,9 +141,7 @@ body {
     display: -webkit-flex;
     display: -ms-flex;
     display: flex;
-    -webkit-flex-wrap: wrap;
-    -ms-flex-wrap: wrap;
-    flex-wrap: wrap;
+
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
 
@@ -129,11 +158,18 @@ body {
 }
 
 .table__left {
-    width: 100%;
+    width: 230px;
     margin-bottom: 10px;
 
     font-weight: bold;
     font-size: 24px;
+}
+
+.table__right {
+    width: calc(100% - 230px);
+    height: 100px;
+
+    font-size: 16px;
 }
 
 .popup {
@@ -177,6 +213,18 @@ body {
     justify-content: space-around;
 
     width: 100%;
+}
+
+.search__input {
+    width: 450px;
+    padding: 10px;
+
+    border: none;
+    background: none;
+    outline: none;
+    border-bottom: 2px solid black;
+
+    font-size: 30px;
 }
 
 @keyframes appear {
