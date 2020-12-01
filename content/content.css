@@ -133,6 +133,10 @@
 
 
 .entity-result__title-line,
+.feed-shared-actor__container-link,
+.comments-post-meta__profile-link,
+.RomanistHere-filled,
+.comments-comment-item__inline-show-more-text,
 .core-rail .artdeco-card,
 .msg-thread__link-to-profile,
 .msg-overlay-bubble-header__title
@@ -143,4 +147,12 @@
 
 .msg-entity-lockup__entity-info {
     max-width: 370px !important;
+}
+
+.feed-shared-actor__meta {
+    max-width: 440px !important;
+}
+
+.comments-post-meta__actor {
+    max-width: 300px !important;
 }

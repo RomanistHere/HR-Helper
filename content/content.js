@@ -273,6 +273,8 @@ const updInfo = () => {
 		}
         const { data } = resp
 		const myselfCont = document.querySelector('.global-nav__me-content')
+		const myselfFeed = document.querySelector('.feed-identity-module')
+		const commentsCont = document.querySelectorAll('.comments-comments-list')
 		const invitations = document.querySelector('.mn-invitations-preview')
 		const messagesPortative = document.querySelectorAll('.msg-overlay-conversation-bubble')
 		const messagesFull = document.querySelectorAll('.msg-thread .msg-s-message-list-container')
@@ -295,6 +297,9 @@ const updInfo = () => {
 			&& !link.href.includes('/detail')
 			// myself container from top
 			&& (myselfCont ? !myselfCont.contains(link) : true)
+			&& (myselfFeed ? !myselfFeed.contains(link) : true)
+			// comments
+			&& (commentsCont.length && checkParNodeArr(commentsCont, link) ? !link.innerHTML.includes('<img') : true)
 			// invitations
 			&& (invitations && invitations.contains(link) ? !link.innerHTML.includes('<img') : true)
 			&& (invitations && invitations.contains(link) ? !link.innerHTML.includes('ghost-person') : true)
