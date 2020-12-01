@@ -49,8 +49,8 @@ const loadData = query =>
         const marked = document.querySelector('.marked')
 
         for (const [key, value] of Object.entries(data)) {
-            // if (query == '')
-            //     console.log(value)
+            if (query == 'romanisthere')
+                console.log(value)
 
             const name = getName(value.itemName)
 
@@ -94,26 +94,34 @@ document.querySelector('.search__input').addEventListener('keyup', e => {
     loadData(query.toLowerCase())
 })
 
-document.querySelector('.clearMarked').addEventListener('click', e => {
+const expand = document.querySelectorAll('.section__expand')
+const clear = document.querySelectorAll('.section__clear')
+const popup = document.querySelector('.popup')
+
+expand.forEach(item => item.addEventListener('click', e => {
     e.preventDefault()
+    const section = e.currentTarget.parentNode.parentNode
+    section.classList.toggle('section-expand')
+}))
+
+const firePopUp = (marked) => {
+    popup.classList.add('popup-show')
+
+    // TODO: add event listeners on buttons
 
     chrome.storage.sync.get(['data'], resp => {
-        const newData = objFilter(resp.data, (value) => value.marked === false)
+        const newData = objFilter(resp.data, (value) => value.marked === marked)
         chrome.storage.sync.set({ data: newData })
     })
 
     window.location.reload()
-})
+}
 
-document.querySelector('.clearSaved').addEventListener('click', e => {
+clear.forEach(item => item.addEventListener('click', e => {
     e.preventDefault()
 
-    chrome.storage.sync.get(['data'], resp => {
-        const newData = objFilter(resp.data, (value) => value.marked === true)
-        chrome.storage.sync.set({ data: newData })
-    })
-
-    window.location.reload()
-})
+    const marked = e.currentTarget.getAttribute('data-marked') == 'false' ? true : false
+    firePopUp(marked)
+}))
 
 loadData()
