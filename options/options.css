@@ -235,3 +235,15 @@ body {
         opacity: 1;
     }
 }
+
+.expanded {
+    position: fixed;
+    display: none;
+
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+
+    background-color: #1c1d1d;
+}
