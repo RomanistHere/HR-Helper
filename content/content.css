@@ -1,3 +1,9 @@
+:root {
+    --main-col: #0b66c2;
+    --bg-col2: #f9fafb;
+    --bg-col1: #fff;
+}
+
 .RomanistHere__header {
     position: absolute;
     z-index: 100000000;
@@ -40,13 +46,13 @@
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
 
-    border: 2px solid #0a66c2;
+    border: 2px solid var(--main-col);
     border-radius: 50%;
     border-radius: 4px;
 }
 
 .RomanistHere__icon-filled {
-    background-color: #0a66c2;
+    background-color: var(--main-col);
 }
 
 .RomanistHere__icon-marked {
@@ -63,9 +69,9 @@
     width: 200px;
     height: 150px;
 
-    background-color: #fff;
+    background-color: var(--bg-col2);
 
-    border: 2px solid;
+    border: 2px solid var(--main-col);
     border-radius: 10px;
 }
 
@@ -90,7 +96,7 @@
     width: calc(100% - 10px);
     bottom: 30px;
 
-    background-color: #fff;
+    background-color: var(--bg-col1);
 }
 
 .RomanistHere__link {

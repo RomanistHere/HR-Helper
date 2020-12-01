@@ -63,15 +63,21 @@ const fillText = (item, text) => {
 
 // fill item from storage
 const fillItem = (item, data) => {
+	// check if focused
 	const formWrap = item.querySelector('.RomanistHere__wrap')
 	if (formWrap && formWrap.classList.contains('RomanistHere__wrap-show')) {
 		return
 	}
 
+	// reset to default
+	fillText(item, '')
+	item.querySelector('.RomanistHere__icon').classList.remove('RomanistHere__icon-marked')
+	item.querySelector('.RomanistHere__icon').classList.remove('RomanistHere__icon-filled')
+	switchModeToEmpty(item)
+
+	// fill accordingly
 	if (data == null) {
-		fillText(item, '')
-		item.querySelector('.RomanistHere__icon').classList.remove('RomanistHere__icon-filled')
-		switchModeToEmpty(item)
+		return
 	} else if (data.text && data.text.length > 0) {
         fillText(item, data.text)
     } else if (data.marked) {
@@ -131,7 +137,7 @@ const removeItem = (e, url, textArea, formWrap, item) => {
 // }
 
 const showErrMess = err => {
-	console.warn(err)
+	alert(err)
 }
 
 const saveToStorage = (key, value) =>
@@ -140,8 +146,10 @@ const saveToStorage = (key, value) =>
 			showErrMess('Sorry, something is not working. No data from storage')
 			return
 		}
+
         const { data } = resp
         const newData = { ...data, [key]: value }
+
         chrome.storage.sync.set({ data: newData })
     })
 
@@ -160,10 +168,17 @@ const getName = string => {
 	.replace(/[\n\r]/g, ' ')
 }
 
-// save item to storage
-const saveChanges = (e, url, textArea, formWrap, item) => {
+const getNameAndUrl = (item, url) => {
 	const header = document.querySelector('.global-nav')
 	const name = header.contains(item) ? document.querySelector('.pv-top-card__photo').getAttribute('title') : getName(item.innerText)
+	const newUrl = window.location.href.includes('/messaging/') ? getPureURL(item.getAttribute('href')) : url
+
+	return { name, newUrl }
+}
+
+// save item to storage
+const saveChanges = (e, url, textArea, formWrap, item) => {
+	const { name, newUrl } = getNameAndUrl(item, url)
 
     const newItem = {
         text: textArea.value,
@@ -172,21 +187,21 @@ const saveChanges = (e, url, textArea, formWrap, item) => {
         itemName: name
     }
 
-    saveToStorage(url, newItem)
+    saveToStorage(newUrl, newItem)
     closeForm(e, item, formWrap, true)
 }
 
 // save item as marked to storage
 const markItem = (e, url, formWrap, item) => {
-	const header = document.querySelector('.global-nav')
-	const name = header.contains(item) ? document.querySelector('.pv-top-card__photo').getAttribute('title') : getName(item.innerText)
+	const { name, newUrl } = getNameAndUrl(item, url)
 
     const newItem = {
+		date: new Date().toLocaleDateString(),
 		marked: true,
 		itemName: name
 	}
 
-    saveToStorage(url, newItem)
+    saveToStorage(newUrl, newItem)
     closeForm(e, item, formWrap, false)
 
     item.querySelector('.RomanistHere__icon').classList.add('RomanistHere__icon-marked')
@@ -271,6 +286,7 @@ const updInfo = () => {
 			showErrMess('Sorry, something is not working. No data from storage')
 			return
 		}
+
         const { data } = resp
 		const myselfCont = document.querySelector('.global-nav__me-content')
 		const myselfFeed = document.querySelector('.feed-identity-module')
@@ -314,7 +330,6 @@ const updInfo = () => {
 			const url = item.href
 			const fixedUrl = url[url.length - 1] == '/' ? url : `${url}/`
 			const key = getPureURL(fixedUrl)
-			// console.log(key)
 
 			if (!item.innerHTML.includes('RomanistHere__wrapper'))
 				appendElements(item, key)
