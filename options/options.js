@@ -106,15 +106,31 @@ expand.forEach(item => item.addEventListener('click', e => {
 
 const firePopUp = (marked) => {
     popup.classList.add('popup-show')
+    const deleteBtn = popup.querySelector('.delete')
+    const notDeleteBtn = popup.querySelector('.notDelete')
 
-    // TODO: add event listeners on buttons
+    const handleDel = e => {
+        e.preventDefault()
 
-    chrome.storage.sync.get(['data'], resp => {
-        const newData = objFilter(resp.data, (value) => value.marked === marked)
-        chrome.storage.sync.set({ data: newData })
-    })
+        chrome.storage.sync.get(['data'], resp => {
+            const newData = objFilter(resp.data, (value) => value.marked === marked)
+            chrome.storage.sync.set({ data: newData })
+        })
 
-    window.location.reload()
+        window.location.reload()
+    }
+
+    const handleNotDel = e => {
+        e.preventDefault()
+
+        popup.classList.remove('popup-show')
+
+        deleteBtn.removeEventListener('click', handleDel)
+        notDeleteBtn.removeEventListener('click', handleNotDel)
+    }
+
+    deleteBtn.addEventListener('click', handleDel)
+    notDeleteBtn.addEventListener('click', handleNotDel)
 }
 
 clear.forEach(item => item.addEventListener('click', e => {
