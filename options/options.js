@@ -10,11 +10,12 @@ const stringTemplate = (textLeft, href, toUpd = false) =>
         <a class="table__link link" title="Open ${textLeft} in the new tab" target="_blank" href="https://www.linkedin.com/in/${href}/">${textLeft}</a>
     </div>
     <textarea class="table__right"></textarea>
-    <a class="remove" title="Delete" data-key="${href}" href="#">X</a>
-    <a class="${toUpd ? 'save' : 'update'}" title="Update and save" data-key="${href}" href="#">${toUpd ? 'Unmark and save' : 'Update'}</a>`
+    <a class="remove" title="Delete" data-key="${href}" href="#">del</a>
+    <a class="expand" title="Show in full-screen" data-key="${href}" href="#">full-screen</a>
+    <a class="${toUpd ? 'save' : 'update'}" title="Update and save" data-key="${href}" href="#">${toUpd ? 'Unmark and save' : 'Save changes'}</a>`
 
 const getName = string =>
-    string.trimStart().replace(/[\n\r]/g, ' ').split(' ').slice(0, 2).join(' ')
+    string ? string.trimStart().replace(/[\n\r]/g, ' ').split(' ').slice(0, 2).join(' ') : null
 
 const objFilter = (obj, condition) => {
     let newObj = {}
@@ -78,6 +79,11 @@ const loadData = query =>
                         e.currentTarget.parentNode.querySelector('.save').classList.add('update-show')
                     })
 
+                    newItem.querySelector('.expand').addEventListener('click', e => {
+                        e.preventDefault()
+                        window.location.search = `key=${key}&name=${name}`
+                    })
+
                     const saveBtn = newItem.querySelector('.save')
                     saveBtn.addEventListener('click', e => {
                         e.preventDefault()
@@ -113,6 +119,11 @@ const loadData = query =>
                 textArea.value = value.text
                 textArea.addEventListener('click', e => {
                     e.currentTarget.parentNode.querySelector('.update').classList.add('update-show')
+                })
+
+                tableWrap.querySelector('.expand').addEventListener('click', e => {
+                    e.preventDefault()
+                    window.location.search = `key=${key}&name=${name}`
                 })
             }
         }
@@ -213,6 +224,7 @@ const initExpand = () => {
     nameLink.innerText = getName(name)
 
     expanded.classList.add('expanded-show')
+    document.body.style.overflow = 'hidden'
 
     saveBtn.addEventListener('click', e => {
         e.preventDefault()
@@ -254,7 +266,7 @@ const initExpand = () => {
 
         const { data } = resp
         if (data[key]) {
-            textArea.value = data[key].text
+            textArea.value = data[key].text ? data[key].text : ''
         } else {
 
         }

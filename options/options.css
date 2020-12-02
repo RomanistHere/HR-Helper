@@ -92,6 +92,36 @@ body {
     font-weight: bold;
     font-size: 16px;
     color: var(--cross-col);
+
+    opacity: 0;
+    transition: all ease .1s;
+}
+
+.table .remove {
+    top: 2px;
+}
+
+.marked__link:hover .remove,
+.marked__link:hover .moveToSaved,
+.table__string:hover .remove,
+.table__string:hover .expand {
+    opacity: 1;
+}
+
+.expand {
+    position: absolute;
+
+    top: 2px;
+    right: 30px;
+    padding: 2px 5px;
+
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 16px;
+    color: var(--new-col);
+
+    opacity: 0;
+    transition: all ease .1s;
 }
 
 .update,
@@ -118,6 +148,9 @@ body {
 
     color: var(--new-col);
     font-weight: bold;
+
+    opacity: 0;
+    transition: all ease .1s;
 }
 
 .update-show {
@@ -147,7 +180,7 @@ body {
 
     margin-bottom: 10px;
     width: 49%;
-    padding: 20px;
+    padding: 30px 20px 20px;
     border: 4px solid var(--main-col);
     border-radius: 4px;
 
