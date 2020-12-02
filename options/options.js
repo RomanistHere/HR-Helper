@@ -27,6 +27,34 @@ const objFilter = (obj, condition) => {
     return newObj
 }
 
+const saveChanges = (key, newText, name) =>
+    chrome.storage.sync.get(['data'], resp => {
+        const newData = {
+            ...resp.data,
+            [key]: {
+                text: newText,
+                marked: false,
+                itemName: getName(name),
+                date: new Date().toLocaleDateString()
+            }
+        }
+        chrome.storage.sync.set({ data: newData })
+    })
+
+const handleClick = (elem, func) => {
+    if (elem.length == null) {
+        elem.addEventListener('click', e => {
+            e.preventDefault()
+            func(e)
+        })
+    } else {
+        elem.forEach(item => item.addEventListener('click', e => {
+            e.preventDefault()
+            func(e)
+        }))
+    }
+}
+
 const clearScreen = () => {
     const table = document.querySelector('.table')
     const marked = document.querySelector('.marked')
@@ -61,9 +89,7 @@ const loadData = query =>
 
                 // handle moveToSaved button
                 const moveToSaved = linksWrap.querySelector('.moveToSaved')
-                moveToSaved.addEventListener('click', e => {
-                    e.stopPropagation()
-                    e.preventDefault()
+                handleClick(moveToSaved, e => {
                     e.currentTarget.parentNode.parentNode.remove()
 
                     const newItem = document.createElement('div')
@@ -79,14 +105,12 @@ const loadData = query =>
                         e.currentTarget.parentNode.querySelector('.save').classList.add('update-show')
                     })
 
-                    newItem.querySelector('.expand').addEventListener('click', e => {
-                        e.preventDefault()
+                    handleClick(newItem.querySelector('.expand'), () => {
                         window.location.search = `key=${key}&name=${name}`
                     })
 
                     const saveBtn = newItem.querySelector('.save')
-                    saveBtn.addEventListener('click', e => {
-                        e.preventDefault()
+                    handleClick(saveBtn, () => {
                         const newText = textArea.value
                         chrome.storage.sync.get(['data'], resp => {
                             const newData = {
@@ -121,15 +145,13 @@ const loadData = query =>
                     e.currentTarget.parentNode.querySelector('.update').classList.add('update-show')
                 })
 
-                tableWrap.querySelector('.expand').addEventListener('click', e => {
-                    e.preventDefault()
+                handleClick(tableWrap.querySelector('.expand'), () => {
                     window.location.search = `key=${key}&name=${name}`
                 })
             }
         }
 
-        document.querySelectorAll('.remove').forEach(item => item.addEventListener('click', e => {
-            e.preventDefault()
+        handleClick(document.querySelectorAll('.remove'), e => {
             const elem = e.currentTarget
             const key = elem.getAttribute('data-key')
             chrome.storage.sync.get(['data'], resp => {
@@ -138,10 +160,9 @@ const loadData = query =>
                 chrome.storage.sync.set({ data: newData })
                 elem.parentNode.remove()
             })
-        }))
+        })
 
-        document.querySelectorAll('.update').forEach(item => item.addEventListener('click', e => {
-            e.preventDefault()
+        handleClick(document.querySelectorAll('.update'), e => {
             const elem = e.currentTarget
             const key = elem.getAttribute('data-key')
             const newVal = elem.parentNode.querySelector('.table__right').value
@@ -149,7 +170,7 @@ const loadData = query =>
                 const newData = { ...resp.data, [key]: { ...resp.data[key], text: newVal } }
                 chrome.storage.sync.set({ data: newData })
             })
-        }))
+        })
     })
 
 document.querySelector('.search__input').addEventListener('keyup', e => {
@@ -163,9 +184,7 @@ const clear = document.querySelectorAll('.section__clear')
 const popup = document.querySelector('.popup')
 const closeInfo = document.querySelector('.section__info-close')
 
-closeInfo.addEventListener('click', e => {
-    e.preventDefault()
-
+handleClick(closeInfo, e => {
     e.currentTarget.parentNode.classList.remove('section__info-show')
     e.currentTarget.parentNode.classList.remove('section__info-display')
 
@@ -184,11 +203,10 @@ chrome.storage.sync.get(['optionsState'], resp => {
     }
 })
 
-expand.forEach(item => item.addEventListener('click', e => {
-    e.preventDefault()
+handleClick(expand, () => {
     const section = e.currentTarget.parentNode.parentNode
     section.classList.toggle('section-expand')
-}))
+})
 
 const firePopUp = (marked) => {
     popup.classList.add('popup-show')
@@ -219,15 +237,12 @@ const firePopUp = (marked) => {
     notDeleteBtn.addEventListener('click', handleNotDel)
 }
 
-clear.forEach(item => item.addEventListener('click', e => {
-    e.preventDefault()
-
+handleClick(clear, () => {
     const marked = e.currentTarget.getAttribute('data-marked') == 'false' ? true : false
     firePopUp(marked)
-}))
+})
 
 loadData()
-
 
 // EXPAND //
 const initExpand = () => {
@@ -243,33 +258,40 @@ const initExpand = () => {
     const removeBtn = expanded.querySelector('.expanded__remove')
     const close = expanded.querySelector('.expanded__close')
     const infoLinks = expanded.querySelectorAll('.expanded__why')
+
+    // set up elements
     nameLink.href = `${nameLink.href}${key}/`
     nameLink.innerText = getName(name)
+    // set text if saved
+    chrome.storage.sync.get(['data'], resp => {
+        if (!resp.data)
+            return
 
+        const { data } = resp
+
+        if (data[key]) {
+            textArea.value = data[key].text ? data[key].text : ''
+        }
+    })
+
+    // show expanded menu
     expanded.classList.add('expanded-show')
     document.body.style.overflow = 'hidden'
 
-    saveBtn.addEventListener('click', e => {
-        e.preventDefault()
-        const newText = textArea.value
-
-        chrome.storage.sync.get(['data'], resp => {
-            const newData = {
-                ...resp.data,
-                [key]: {
-                    text: newText,
-                    marked: false,
-                    itemName: getName(name),
-                    date: new Date().toLocaleDateString()
-                }
-            }
-            chrome.storage.sync.set({ data: newData })
-        })
+    // event listeners
+    textArea.addEventListener('keydown', e => {
+        if (e.keyCode === 13 && e.ctrlKey) {
+            const newText = textArea.value
+            saveChanges(key, newText, name)
+        }
     })
 
-    removeBtn.addEventListener('click', e => {
-        e.preventDefault()
+    handleClick(saveBtn, () => {
+        const newText = textArea.value
+        saveChanges(key, newText, name)
+    })
 
+    handleClick(removeBtn, () => {
         chrome.storage.sync.get(['data'], resp => {
             let newData = resp.data
             delete newData[key]
@@ -278,28 +300,14 @@ const initExpand = () => {
         })
     })
 
-    close.addEventListener('click', e => {
-        e.preventDefault()
+    handleClick(close, () => {
         window.location.search = ''
     })
 
-    chrome.storage.sync.get(['data'], resp => {
-        if (!resp.data)
-            return
-
-        const { data } = resp
-        if (data[key]) {
-            textArea.value = data[key].text ? data[key].text : ''
-        } else {
-
-        }
-    })
-
-    infoLinks.forEach(item => item.addEventListener('click', e => {
-        e.preventDefault()
+    handleClick(infoLinks, () => {
         document.querySelector('.section__info').classList.add('section__info-display')
         document.querySelector('.section__info').classList.add('section__info-show')
-    }))
+    })
 }
 
 initExpand()

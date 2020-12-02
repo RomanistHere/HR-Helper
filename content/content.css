@@ -145,7 +145,8 @@
 .comments-comment-item__inline-show-more-text,
 .core-rail .artdeco-card,
 .msg-thread__link-to-profile,
-.msg-overlay-bubble-header__title
+.social-details-reactors-tab-body,
+.msg-overlay-bubble-header__title,
 .msg-overlay-bubble-header__details,
 .display-flex.flex-column.justify-center.overflow-hidden.pl2 {
     overflow: visible !important;

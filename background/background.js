@@ -9,12 +9,21 @@ chrome.runtime.onInstalled.addListener(details => {
         })
     } else if (details.reason == 'update') {
         chrome.storage.sync.get(['data'], resp => {
-            // console.log(resp.data)
-            chrome.storage.sync.set({
-                optionsState: {
-                    infoClosed: false
-                }
-            })
+            if (!resp.data) {
+                chrome.storage.sync.set({
+                    data: {},
+                    optionsState: {
+                        infoClosed: false
+                    }
+                })
+            } else {
+                chrome.storage.sync.set({
+                    bckp: { ...resp.data },
+                    optionsState: {
+                        infoClosed: false
+                    }
+                })
+            }
         })
     }
 })
