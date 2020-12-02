@@ -161,6 +161,28 @@ document.querySelector('.search__input').addEventListener('keyup', e => {
 const expand = document.querySelectorAll('.section__expand')
 const clear = document.querySelectorAll('.section__clear')
 const popup = document.querySelector('.popup')
+const closeInfo = document.querySelector('.section__info-close')
+
+closeInfo.addEventListener('click', e => {
+    e.preventDefault()
+
+    e.currentTarget.parentNode.classList.remove('section__info-show')
+    e.currentTarget.parentNode.classList.remove('section__info-display')
+
+    chrome.storage.sync.set({
+        optionsState: {
+            infoClosed: true
+        }
+    })
+})
+
+chrome.storage.sync.get(['optionsState'], resp => {
+    const { optionsState } = resp
+
+    if (!optionsState.infoClosed) {
+        document.querySelector('.section__info').classList.add('section__info-display')
+    }
+})
 
 expand.forEach(item => item.addEventListener('click', e => {
     e.preventDefault()
@@ -220,6 +242,7 @@ const initExpand = () => {
     const saveBtn = expanded.querySelector('.expanded__save')
     const removeBtn = expanded.querySelector('.expanded__remove')
     const close = expanded.querySelector('.expanded__close')
+    const infoLinks = expanded.querySelectorAll('.expanded__why')
     nameLink.href = `${nameLink.href}${key}/`
     nameLink.innerText = getName(name)
 
@@ -271,6 +294,12 @@ const initExpand = () => {
 
         }
     })
+
+    infoLinks.forEach(item => item.addEventListener('click', e => {
+        e.preventDefault()
+        document.querySelector('.section__info').classList.add('section__info-display')
+        document.querySelector('.section__info').classList.add('section__info-show')
+    }))
 }
 
 initExpand()
