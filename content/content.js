@@ -209,7 +209,12 @@ const markItem = (e, url, formWrap, item) => {
 
 const openOptPage = (e, url, item, formWrap) => {
     e.preventDefault()
-    chrome.runtime.sendMessage({ message: 'openOptPage', key: url })
+	const { name, newUrl } = getNameAndUrl(item, url)
+    chrome.runtime.sendMessage({
+		message: 'openOptPage',
+		key: newUrl,
+		name: name
+	})
     closeForm(e, item, formWrap, false)
 }
 

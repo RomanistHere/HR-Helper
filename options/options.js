@@ -1,6 +1,3 @@
-// const query = window.location.search.slice(1)
-// console.log(query)
-
 const linkTemplate = (href, name) =>
     `<a class="marked__link link" title="Open ${name} in the new tab" target="_blank" href="https://www.linkedin.com/in/${href}/">
         ${name}
@@ -197,3 +194,71 @@ clear.forEach(item => item.addEventListener('click', e => {
 }))
 
 loadData()
+
+
+// EXPAND //
+const initExpand = () => {
+    const query = window.location.search.slice(1)
+    if (query.length === 0)
+        return
+
+    const { key, name } = Object.fromEntries(new URLSearchParams(location.search))
+    const expanded = document.querySelector('.expanded')
+    const nameLink = expanded.querySelector('.expanded__name')
+    const textArea = expanded.querySelector('.expanded__text')
+    const saveBtn = expanded.querySelector('.expanded__save')
+    const removeBtn = expanded.querySelector('.expanded__remove')
+    const close = expanded.querySelector('.expanded__close')
+    nameLink.href = `${nameLink.href}${key}/`
+    nameLink.innerText = getName(name)
+
+    expanded.classList.add('expanded-show')
+
+    saveBtn.addEventListener('click', e => {
+        e.preventDefault()
+        const newText = textArea.value
+
+        chrome.storage.sync.get(['data'], resp => {
+            const newData = {
+                ...resp.data,
+                [key]: {
+                    text: newText,
+                    marked: false,
+                    itemName: getName(name),
+                    date: new Date().toLocaleDateString()
+                }
+            }
+            chrome.storage.sync.set({ data: newData })
+        })
+    })
+
+    removeBtn.addEventListener('click', e => {
+        e.preventDefault()
+
+        chrome.storage.sync.get(['data'], resp => {
+            let newData = resp.data
+            delete newData[key]
+            chrome.storage.sync.set({ data: newData })
+            textArea.value = ''
+        })
+    })
+
+    close.addEventListener('click', e => {
+        e.preventDefault()
+        window.location.search = ''
+    })
+
+    chrome.storage.sync.get(['data'], resp => {
+        if (!resp.data)
+            return
+
+        const { data } = resp
+        if (data[key]) {
+            textArea.value = data[key].text
+        } else {
+
+        }
+    })
+}
+
+initExpand()

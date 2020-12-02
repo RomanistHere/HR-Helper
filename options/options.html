@@ -48,18 +48,36 @@
         </div>
 
         <section class="expanded">
-            <div class="expanded__grp">
-                Name: <span class="expanded__name"></span>
+            <div class="expanded__top">
+                <a
+                    class="expanded__link expanded__name link"
+                    title="Open link in the new tab"
+                    target="_blank"
+                    href="https://www.linkedin.com/in/">
+                    Name
+                </a>
             </div>
-            <div class="expanded__grp">
-                Last note: <span class="expanded__date"></span>
+            <div class="expanded__wrap">
+                <div class="expanded__sect">
+                    <div class="expanded__left">
+                        <span class="expanded__capt">Your notes:</span>
+                        <div class="expanded__btns">
+                            <a href="#" class="expanded__btn expanded__save">Save</a>
+                            <a href="#" class="expanded__btn expanded__remove">Remove</a>
+                        </div>
+                    </div>
+                    <textarea class="expanded__right expanded__text"></textarea>
+                </div>
+                <div class="expanded__sect"></div>
+                <div class="expanded__sect"></div>
             </div>
-            <div class="expanded__grp">
-                Note: <span class="expanded__note"></span>
-            </div>
-            <div class="expanded__grp">
-                Marked: <span class="expanded__marked"></span>
-            </div>
+            <a href="#" class="expanded__close">
+    			<div class="outer">
+    				<div class="inner">
+    					<span class="close_label">Close</span>
+    				</div>
+    			</div>
+    		</a>
         </section>
 
         <script type="module" src="options.js"></script>

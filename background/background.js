@@ -16,7 +16,7 @@ chrome.runtime.onInstalled.addListener(details => {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.message == 'openOptPage') {
         const curOptionsUrl = chrome.extension.getURL('options/options.html')
-        const optionsUrl = `${curOptionsUrl}?${request.key}`
+        const optionsUrl = `${curOptionsUrl}?key=${request.key}&name=${request.name}`
         chrome.tabs.query({ url: optionsUrl }, tabs => {
             if (tabs.length) {
                 chrome.tabs.update(tabs[0].id, { active: true })
