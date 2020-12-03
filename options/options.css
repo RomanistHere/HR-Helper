@@ -55,6 +55,17 @@ body {
     display: flex;
 }
 
+.info {
+    position: absolute;
+
+    top: 0;
+    right: 40px;
+    padding: 20px 20px 20px 40px;
+    border-radius: 10px;
+
+    background-color: var(--bg-col);
+}
+
 @keyframes appearing {
     0%, 100% { opacity: 0; }
     30%, 70% { opacity: 1; }

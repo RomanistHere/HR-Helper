@@ -221,6 +221,14 @@ const saveChanges = (e, url, textArea, formWrap, item) => {
     closeForm(e, item, formWrap, true)
 }
 
+const saveOnEnter = (url, textArea, formWrap, item) => {
+	textArea.addEventListener('keydown', e => {
+        if (e.keyCode === 13 && e.ctrlKey) {
+            saveChanges(e, url, textArea, formWrap, item)
+        }
+    })
+}
+
 // save item as marked to storage
 const markItem = (e, url, formWrap, item) => {
 	const { name, newUrl } = getNameAndUrl(item, url)
@@ -291,6 +299,7 @@ const appendElements = (item, url) => {
     mark.addEventListener('click', e => markItem(e, url, formWrap, item))
     expand.addEventListener('click', e => openOptPage(e, url, item, formWrap))
     textArea.addEventListener('input', e => { switchModeToFull(item) })
+	saveOnEnter(url, textArea, formWrap, item)
 
     // mark wrapper as processed
     item.classList.add('RomanistHere-filled')
