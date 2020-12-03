@@ -67,6 +67,16 @@ const clearScreen = () => {
     marked.innerHTML = ''
 }
 
+const saveOnEnter = (textArea, key, name) => {
+    textArea.addEventListener('keydown', e => {
+        if (e.keyCode === 13 && e.ctrlKey) {
+            const newText = textArea.value
+            saveChanges(key, newText, name)
+            textArea.parentNode.querySelector('.update').classList.remove('update-show')
+        }
+    })
+}
+
 const loadData = queryArr =>
     chrome.storage.sync.get(['data'], resp => {
         if (!resp.data)
@@ -112,6 +122,8 @@ const loadData = queryArr =>
                         e.currentTarget.parentNode.querySelector('.save').classList.add('update-show')
                     })
 
+                    saveOnEnter(textArea, key, name)
+
                     handleClick(newItem.querySelector('.expand'), () => {
                         window.location.search = `key=${key}&name=${name}`
                     })
@@ -143,6 +155,8 @@ const loadData = queryArr =>
                 textArea.addEventListener('input', e => {
                     e.currentTarget.parentNode.querySelector('.update').classList.add('update-show')
                 })
+
+                saveOnEnter(textArea, key, name)
 
                 handleClick(tableWrap.querySelector('.expand'), () => {
                     window.location.search = `key=${key}&name=${name}`
@@ -291,12 +305,7 @@ const initExpand = () => {
     document.body.style.overflow = 'hidden'
 
     // event listeners
-    textArea.addEventListener('keydown', e => {
-        if (e.keyCode === 13 && e.ctrlKey) {
-            const newText = textArea.value
-            saveChanges(key, newText, name)
-        }
-    })
+    saveOnEnter(textArea, key, name)
 
     handleClick(saveBtn, () => {
         const newText = textArea.value
