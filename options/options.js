@@ -237,7 +237,7 @@ const firePopUp = (marked) => {
     notDeleteBtn.addEventListener('click', handleNotDel)
 }
 
-handleClick(clear, () => {
+handleClick(clear, (e) => {
     const marked = e.currentTarget.getAttribute('data-marked') == 'false' ? true : false
     firePopUp(marked)
 })

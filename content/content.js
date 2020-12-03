@@ -1,9 +1,11 @@
+// STATE //
+
 let state = {
 	prevUrl: window.location.href
 }
 
-// get unique url
-const getPureURL = url => url.substring(url.lastIndexOf("/in/") + 4, url.indexOf("/", url.lastIndexOf("/in/") + 5))
+// HELPERS //
+const getKeyFromURL = url => url.substring(url.lastIndexOf("/in/") + 4, url.indexOf("/", url.lastIndexOf("/in/") + 5))
 
 const debounce = (func, wait, immediate) => {
 	var timeout
@@ -20,6 +22,19 @@ const debounce = (func, wait, immediate) => {
 	}
 }
 
+const checkParNodeArr = (arr, elem) => {
+	for (let i = 0; i < arr.length; i++) {
+		if (arr[i].contains(elem)) {
+			return true
+		}
+	}
+	return false
+}
+
+const showErrMess = err => {
+	alert(err)
+}
+
 const formTemplate = () =>
     `<form action="#" class="RomanistHere__form">
         <a href="#" class="RomanistHere__link RomanistHere__link_close">X</a>
@@ -32,24 +47,31 @@ const formTemplate = () =>
 
 // textarea is not empty
 const switchModeToFull = item => {
-    const remove = item.querySelector('.RomanistHere__link_remove')
-    const save = item.querySelector('.RomanistHere__btn')
-    const mark = item.querySelector('.RomanistHere__link_mark')
-
-    remove.classList.remove('RomanistHere__link-dis')
-    save.classList.remove('RomanistHere__link-dis')
-    mark.classList.add('RomanistHere__link-dis')
+    item.querySelector('.RomanistHere__link_remove').classList.remove('RomanistHere__link-dis')
+    item.querySelector('.RomanistHere__btn').classList.remove('RomanistHere__link-dis')
+    item.querySelector('.RomanistHere__link_mark').classList.add('RomanistHere__link-dis')
 }
 
 // textarea is empty
 const switchModeToEmpty = item => {
-    const remove = item.querySelector('.RomanistHere__link_remove')
-    const save = item.querySelector('.RomanistHere__btn')
-    const mark = item.querySelector('.RomanistHere__link_mark')
+    item.querySelector('.RomanistHere__link_remove').classList.add('RomanistHere__link-dis')
+    item.querySelector('.RomanistHere__btn').classList.add('RomanistHere__link-dis')
+    item.querySelector('.RomanistHere__link_mark').classList.remove('RomanistHere__link-dis')
+}
 
-    remove.classList.add('RomanistHere__link-dis')
-    save.classList.add('RomanistHere__link-dis')
-    mark.classList.remove('RomanistHere__link-dis')
+// reset setup to default
+const resetSetup = item => {
+	fillText(item, '')
+	item.querySelector('.RomanistHere__icon').classList.remove('RomanistHere__icon-marked')
+	item.querySelector('.RomanistHere__icon').classList.remove('RomanistHere__icon-filled')
+	switchModeToEmpty(item)
+}
+
+// mark setup
+const markSetup = item => {
+	item.querySelector('.RomanistHere__icon').classList.add('RomanistHere__icon-marked')
+	item.querySelector('.RomanistHere__link_mark').classList.add('RomanistHere__link-dis')
+	item.querySelector('.RomanistHere__link_remove').classList.remove('RomanistHere__link-dis')
 }
 
 // fill text from storage
@@ -63,17 +85,14 @@ const fillText = (item, text) => {
 
 // fill item from storage
 const fillItem = (item, data) => {
-	// check if focused
+	// don't refill if focused
 	const formWrap = item.querySelector('.RomanistHere__wrap')
 	if (formWrap && formWrap.classList.contains('RomanistHere__wrap-show')) {
 		return
 	}
 
 	// reset to default
-	fillText(item, '')
-	item.querySelector('.RomanistHere__icon').classList.remove('RomanistHere__icon-marked')
-	item.querySelector('.RomanistHere__icon').classList.remove('RomanistHere__icon-filled')
-	switchModeToEmpty(item)
+	resetSetup(item)
 
 	// fill accordingly
 	if (data == null) {
@@ -81,9 +100,7 @@ const fillItem = (item, data) => {
 	} else if (data.text && data.text.length > 0) {
         fillText(item, data.text)
     } else if (data.marked) {
-        item.querySelector('.RomanistHere__icon').classList.add('RomanistHere__icon-marked')
-        item.querySelector('.RomanistHere__link_mark').classList.add('RomanistHere__link-dis')
-        item.querySelector('.RomanistHere__link_remove').classList.remove('RomanistHere__link-dis')
+        markSetup(item)
     }
 }
 
@@ -107,8 +124,7 @@ const closeForm = (e, item, formWrap, shouldmark = false) => {
 
 // remove item from storage
 const removeItem = (e, url, textArea, formWrap, item) => {
-    textArea.value = ''
-    item.querySelector('.RomanistHere__icon').classList.remove('RomanistHere__icon-filled')
+    resetSetup(item)
 
     chrome.storage.sync.get(['data'], resp => {
 		if (!resp.data) {
@@ -120,7 +136,6 @@ const removeItem = (e, url, textArea, formWrap, item) => {
         chrome.storage.sync.set({ data: data })
     })
 
-    switchModeToEmpty(item)
     closeForm(e, item, formWrap, false)
 }
 
@@ -135,10 +150,6 @@ const removeItem = (e, url, textArea, formWrap, item) => {
 //     userEmail: string,
 //     userWork: string,
 // }
-
-const showErrMess = err => {
-	alert(err)
-}
 
 const saveToStorage = (key, value) =>
     chrome.storage.sync.get(['data'], resp => {
@@ -155,8 +166,12 @@ const saveToStorage = (key, value) =>
 
 const getName = string => {
 	// console.log(string)
-	return string.trimStart()
+	const newString = string.trimStart()
 	.replace('Expand', '')
+	.replace('Status is online', '')
+	.replace('Status is offline', '')
+	.replace('Status is reachable', '')
+	.replace('Status is unreachable', '')
 	.replace('Save', '')
 	.replace('Member’s name', '')
 	.replace('Clear', '')
@@ -166,12 +181,15 @@ const getName = string => {
 	.replace('/3rd/', '')
 	.replace('degree connection', '')
 	.replace(/[\n\r]/g, ' ')
+	.trimStart()
+	// console.log(newString)
+	return newString
 }
 
 const getNameAndUrl = (item, url) => {
 	const header = document.querySelector('.global-nav')
 	const name = header.contains(item) ? document.querySelector('.pv-top-card__photo').getAttribute('title') : getName(item.innerText)
-	const newUrl = window.location.href.includes('/messaging/') ? getPureURL(item.getAttribute('href')) : url
+	const newUrl = window.location.href.includes('/messaging/') ? getKeyFromURL(item.getAttribute('href')) : url
 
 	return { name, newUrl }
 }
@@ -202,9 +220,8 @@ const markItem = (e, url, formWrap, item) => {
 	}
 
     saveToStorage(newUrl, newItem)
+	markSetup(item)
     closeForm(e, item, formWrap, false)
-
-    item.querySelector('.RomanistHere__icon').classList.add('RomanistHere__icon-marked')
 }
 
 const openOptPage = (e, url, item, formWrap) => {
@@ -267,15 +284,6 @@ const appendElements = (item, url) => {
     item.classList.add('RomanistHere-filled')
 }
 
-const checkParNodeArr = (arr, elem) => {
-	for (let i = 0; i < arr.length; i++) {
-		if (arr[i].contains(elem)) {
-			return true
-		}
-	}
-	return false
-}
-
 // get info from storage
 const updInfo = () => {
     chrome.storage.sync.get(['data'], resp => {
@@ -287,12 +295,18 @@ const updInfo = () => {
 			}
 		}
 
+		if (window.location.href.includes('/notifications')) {
+			return
+		}
+
 		if (!resp.data) {
 			showErrMess('Sorry, something is not working. No data from storage')
 			return
 		}
 
         const { data } = resp
+		const recomendations = document.querySelector('.pv-recommendations-section')
+		const rightRailFeed = document.querySelector('.right-rail')
 		const myselfCont = document.querySelector('.global-nav__me-content')
 		const myselfFeed = document.querySelector('.feed-identity-module')
 		const commentsCont = document.querySelectorAll('.comments-comments-list')
@@ -308,7 +322,6 @@ const updInfo = () => {
 			// sendErr('mutation api 5k+', window.location.href)
 			return
 		}
-
 		const links = allLinks.filter(link =>
 			link.href.includes('in/')
 			&& !link.href.includes('/report/')
@@ -316,9 +329,14 @@ const updInfo = () => {
 			&& !link.href.includes('/#')
 			&& !link.href.includes('/edit/')
 			&& !link.href.includes('/detail')
+			&& !link.href.includes('/?lipi=urn')
+			&& !link.href.includes('/?mini')
 			// myself container from top
 			&& (myselfCont ? !myselfCont.contains(link) : true)
 			&& (myselfFeed ? !myselfFeed.contains(link) : true)
+			// feed
+			&& (rightRailFeed ? !rightRailFeed.contains(link) : true)
+			&& (recomendations ? !recomendations.contains(link) : true)
 			// comments
 			&& (commentsCont.length && checkParNodeArr(commentsCont, link) ? !link.innerHTML.includes('<img') : true)
 			// invitations
@@ -334,7 +352,7 @@ const updInfo = () => {
 		links.map(item => {
 			const url = item.href
 			const fixedUrl = url[url.length - 1] == '/' ? url : `${url}/`
-			const key = getPureURL(fixedUrl)
+			const key = getKeyFromURL(fixedUrl)
 
 			if (!item.innerHTML.includes('RomanistHere__wrapper'))
 				appendElements(item, key)
@@ -344,7 +362,7 @@ const updInfo = () => {
 
 		// person page
 		if (window.location.href.includes('linkedin.com/in/')) {
-			const key = getPureURL(window.location.href)
+			const key = getKeyFromURL(window.location.href)
 			const header = document.querySelector('.global-nav')
 
 			if (header.classList.contains('RomanistHere-filled')) {
@@ -365,9 +383,8 @@ const updInfo = () => {
 
 updInfo()
 
-const debUpdInfo = debounce(updInfo, 300)
-
 // handle Li update
+const debUpdInfo = debounce(updInfo, 300)
 const domObserver = new MutationObserver(mutations => {
     debUpdInfo()
 })
