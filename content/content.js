@@ -43,6 +43,7 @@ const formTemplate = () =>
         <a href="#" class="RomanistHere__link RomanistHere__link-middle RomanistHere__link_mark">Mark</a>
         <a href="#" class="RomanistHere__link RomanistHere__link-middle RomanistHere__link-dis RomanistHere__btn">Save</a>
         <a href="#" class="RomanistHere__link RomanistHere__link_remove RomanistHere__link-right RomanistHere__link-dis">Clear</a>
+		<div class="RomanistHere__saved">Saved</div>
     </form>`
 
 // textarea is not empty
@@ -72,6 +73,11 @@ const markSetup = item => {
 	item.querySelector('.RomanistHere__icon').classList.add('RomanistHere__icon-marked')
 	item.querySelector('.RomanistHere__link_mark').classList.add('RomanistHere__link-dis')
 	item.querySelector('.RomanistHere__link_remove').classList.remove('RomanistHere__link-dis')
+}
+
+const confirmChanges = savedNotif => {
+    savedNotif.classList.add('RomanistHere__saved-show')
+    setTimeout(() => { savedNotif.classList.remove('RomanistHere__saved-show') }, 2500)
 }
 
 // fill text from storage
@@ -133,7 +139,10 @@ const removeItem = (e, url, textArea, formWrap, item) => {
 		}
         let { data } = resp
         delete data[url]
-        chrome.storage.sync.set({ data: data })
+        chrome.storage.sync.set({ data: data }, () => {
+			const savedNotif = item.querySelector('.RomanistHere__saved')
+			confirmChanges(savedNotif)
+		})
     })
 
     closeForm(e, item, formWrap, false)
@@ -151,7 +160,7 @@ const removeItem = (e, url, textArea, formWrap, item) => {
 //     userWork: string,
 // }
 
-const saveToStorage = (key, value) =>
+const saveToStorage = (key, value, item) =>
     chrome.storage.sync.get(['data'], resp => {
 		if (!resp.data) {
 			showErrMess('Sorry, something is not working. No data from storage')
@@ -161,7 +170,10 @@ const saveToStorage = (key, value) =>
         const { data } = resp
         const newData = { ...data, [key]: value }
 
-        chrome.storage.sync.set({ data: newData })
+        chrome.storage.sync.set({ data: newData }, () => {
+			const savedNotif = item.querySelector('.RomanistHere__saved')
+			confirmChanges(savedNotif)
+		})
     })
 
 const getName = string => {
@@ -205,7 +217,7 @@ const saveChanges = (e, url, textArea, formWrap, item) => {
         itemName: name
     }
 
-    saveToStorage(newUrl, newItem)
+    saveToStorage(newUrl, newItem, item)
     closeForm(e, item, formWrap, true)
 }
 
@@ -219,7 +231,7 @@ const markItem = (e, url, formWrap, item) => {
 		itemName: name
 	}
 
-    saveToStorage(newUrl, newItem)
+    saveToStorage(newUrl, newItem, item)
 	markSetup(item)
     closeForm(e, item, formWrap, false)
 }

@@ -137,6 +137,32 @@
     display: none;
 }
 
+.RomanistHere__saved {
+    position: absolute;
+    z-index: 100000000;
+    display: none;
+
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 0px;
+
+    font-size: 16px;
+
+    animation: RomanistHere__appearing 2s ease;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.RomanistHere__saved-show {
+    display: block;
+}
+
+@keyframes RomanistHere__appearing {
+    0%, 100% { opacity: 0; }
+    30%, 70% { opacity: 1; }
+}
+
 
 .entity-result__title-line,
 .feed-shared-actor__container-link,
