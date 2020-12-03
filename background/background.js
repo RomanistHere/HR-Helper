@@ -18,10 +18,7 @@ chrome.runtime.onInstalled.addListener(details => {
                 })
             } else {
                 chrome.storage.sync.set({
-                    bckp: { ...resp.data },
-                    optionsState: {
-                        infoClosed: false
-                    }
+                    bckp: { ...resp.data }
                 })
             }
         })

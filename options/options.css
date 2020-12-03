@@ -24,6 +24,43 @@ body {
     padding: 0 40px 40px;
 }
 
+.saved {
+    position: fixed;
+    display: none;
+    justify-content: center;
+    -ms-align-items: center;
+    align-items: center;
+
+    width: 120px;
+    height: 40px;
+    top: 15%;
+    right: 20px;
+    border-radius: 5px;
+
+    color: var(--new-col);
+    font-size: 30px;
+    -webkit-font-smoothing: antialiased;
+    text-shadow:
+        -1px 0 black,
+        0 1px black,
+        1px 0 black,
+        0 -1px black;
+
+    animation: appearing 2s ease;
+    opacity: 0;
+}
+
+.saved-show {
+    display: -webkit-flex;
+    display: -ms-flex;
+    display: flex;
+}
+
+@keyframes appearing {
+    0%, 100% { opacity: 0; }
+    30%, 70% { opacity: 1; }
+}
+
 .section {
     margin-bottom: 40px;
 }
