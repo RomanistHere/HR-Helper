@@ -327,7 +327,7 @@ const updInfo = () => {
 
         const { data } = resp
 		const recomendations = document.querySelector('.pv-recommendations-section')
-		const rightRailFeed = document.querySelector('.right-rail')
+		const rightRailFeed = document.querySelector('.feed-follows-module')
 		const myselfCont = document.querySelector('.global-nav__me-content')
 		const myselfFeed = document.querySelector('.feed-identity-module')
 		const commentsCont = document.querySelectorAll('.comments-comments-list')

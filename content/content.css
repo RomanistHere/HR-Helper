@@ -109,7 +109,7 @@
 
     text-decoration: none;
     font-size: 16px;
-    color: var(--main-col);
+    color: var(--main-col) !important;
 }
 
 .RomanistHere__link:hover {
@@ -134,7 +134,7 @@
     left: auto;
     padding: 0 5px;
 
-    color: var(--cross-col);
+    color: var(--cross-col) !important;
 }
 
 .RomanistHere__link-dis {
@@ -152,7 +152,7 @@
     top: 0px;
 
     font-size: 16px;
-    color: var(--main-col);
+    color: var(--main-col) !important;
 
     animation: RomanistHere__appearing 2s ease;
     opacity: 0;
