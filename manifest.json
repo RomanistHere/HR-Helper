@@ -1,11 +1,12 @@
 {
 	"name": "HR helper",
 	"short_name": "HR helper - Linkedin™ private notes",
-	"version": "0.1.9",
+	"version": "0.1.13",
 	"description": "Linkedin private notes",
 	"permissions": [
 		"https://www.linkedin.com/*",
-		"storage"
+		"storage",
+		"unlimitedStorage"
 	],
 	"content_scripts": [
 		{

@@ -77,119 +77,139 @@ const saveOnEnter = (textArea, key, name) => {
     })
 }
 
-const loadData = queryArr =>
-    chrome.storage.sync.get(['data'], resp => {
-        if (!resp.data)
-            return
+const getStorageData = key =>
+    new Promise((resolve, reject) =>
+        chrome.storage.sync.get(key, result =>
+            chrome.runtime.lastError
+            ? reject(Error(chrome.runtime.lastError.message))
+            : resolve(result)
+        )
+    )
 
-        if (queryArr == null)
-            queryArr = []
+const getData = async () => {
+    let resp = await getStorageData(null)
+    let string = ''
 
-        const { data } = resp
-        const table = document.querySelector('.table')
-        const marked = document.querySelector('.marked')
+    delete resp['it']
+    Object.values(resp).forEach(item => {
+        string = string + item
+    })
+    console.log(string)
+    const obj = JSON.parse(string)
+    console.log(obj)
+    return obj
+}
 
-        for (const [key, value] of Object.entries(data)) {
-            if (queryArr[0] == 'romanisthere')
-                console.log(value)
+const loadData = async (queryArr) => {
+    if (queryArr == null)
+        queryArr = []
 
-            const name = getName(value.itemName)
+    const data = await getData()
 
-            // APPEND TO MARKED
-            if (value.marked && queryArr.every(item => name.toLowerCase().includes(item))) {
-                const linksWrap = document.createElement('span')
-                const link = linkTemplate(key, name)
+    const table = document.querySelector('.table')
+    const marked = document.querySelector('.marked')
 
-                linksWrap.innerHTML = link
-                marked.appendChild(linksWrap)
+    for (const [key, value] of Object.entries(data)) {
+        if (queryArr[0] == 'romanisthere')
+            console.log(value)
 
-                // handle moveToSaved button
-                const moveToSaved = linksWrap.querySelector('.moveToSaved')
-                handleClick(moveToSaved, e => {
-                    // move element from marked to saved
-                    e.currentTarget.parentNode.parentNode.remove()
-                    const newItem = document.createElement('div')
-                    const itemData = stringTemplate(name, key, true)
-                    newItem.classList.add('table__string')
-                    newItem.innerHTML = itemData
-                    table.insertBefore(newItem, table.childNodes[0])
+        const name = getName(value.itemName)
 
-                    // handle textarea
-                    const textArea = newItem.querySelector('.table__right')
-                    const saveBtn = newItem.querySelector('.save')
+        // APPEND TO MARKED
+        if (value.marked && queryArr.every(item => name.toLowerCase().includes(item))) {
+            const linksWrap = document.createElement('span')
+            const link = linkTemplate(key, name)
 
-                    textArea.addEventListener('input', e => {
-                        e.currentTarget.parentNode.querySelector('.save').classList.add('update-show')
-                    })
+            linksWrap.innerHTML = link
+            marked.appendChild(linksWrap)
 
-                    saveOnEnter(textArea, key, name)
-
-                    handleClick(newItem.querySelector('.expand'), () => {
-                        window.location.search = `key=${key}&name=${name}`
-                    })
-
-                    handleClick(saveBtn, () => {
-                        const newText = textArea.value
-                        saveChanges(key, newText, name)
-                    })
-                })
-                continue
-            } else if (value.marked) {
-                continue
-            }
-
-            // append to SAVED
-            if (queryArr.every(item => key.toLowerCase().includes(item))
-                || queryArr.every(item => name.toLowerCase().includes(item))
-                || queryArr.every(item => value.text.toLowerCase().includes(item))) {
-                // create and append element
-                const tableWrap = document.createElement('div')
-                const tableCont = stringTemplate(name, key)
-                tableWrap.classList.add('table__string')
-                tableWrap.innerHTML = tableCont
-                table.appendChild(tableWrap)
+            // handle moveToSaved button
+            const moveToSaved = linksWrap.querySelector('.moveToSaved')
+            handleClick(moveToSaved, e => {
+                // move element from marked to saved
+                e.currentTarget.parentNode.parentNode.remove()
+                const newItem = document.createElement('div')
+                const itemData = stringTemplate(name, key, true)
+                newItem.classList.add('table__string')
+                newItem.innerHTML = itemData
+                table.insertBefore(newItem, table.childNodes[0])
 
                 // handle textarea
-                const textArea = tableWrap.querySelector('.table__right')
-                textArea.value = value.text
+                const textArea = newItem.querySelector('.table__right')
+                const saveBtn = newItem.querySelector('.save')
+
                 textArea.addEventListener('input', e => {
-                    e.currentTarget.parentNode.querySelector('.update').classList.add('update-show')
+                    e.currentTarget.parentNode.querySelector('.save').classList.add('update-show')
                 })
 
                 saveOnEnter(textArea, key, name)
 
-                handleClick(tableWrap.querySelector('.expand'), () => {
+                handleClick(newItem.querySelector('.expand'), () => {
                     window.location.search = `key=${key}&name=${name}`
                 })
-            }
-        }
 
-        handleClick(document.querySelectorAll('.remove'), e => {
-            const elem = e.currentTarget
-            const key = elem.getAttribute('data-key')
-            chrome.storage.sync.get(['data'], resp => {
-                let newData = resp.data
-                delete newData[key]
-                chrome.storage.sync.set({ data: newData }, () => {
-                    confirmChanges()
-                    elem.parentNode.remove()
+                handleClick(saveBtn, () => {
+                    const newText = textArea.value
+                    saveChanges(key, newText, name)
                 })
             })
-        })
+            continue
+        } else if (value.marked) {
+            continue
+        }
 
-        handleClick(document.querySelectorAll('.update'), e => {
-            const elem = e.currentTarget
-            const key = elem.getAttribute('data-key')
-            const newVal = elem.parentNode.querySelector('.table__right').value
-            chrome.storage.sync.get(['data'], resp => {
-                const newData = { ...resp.data, [key]: { ...resp.data[key], text: newVal } }
-                chrome.storage.sync.set({ data: newData }, () => {
-                    confirmChanges()
-                    elem.parentNode.querySelector('.update').classList.remove('update-show')
-                })
+        // append to SAVED
+        if (queryArr.every(item => key.toLowerCase().includes(item))
+            || queryArr.every(item => name.toLowerCase().includes(item))
+            || queryArr.every(item => value.text.toLowerCase().includes(item))) {
+            // create and append element
+            const tableWrap = document.createElement('div')
+            const tableCont = stringTemplate(name, key)
+            tableWrap.classList.add('table__string')
+            tableWrap.innerHTML = tableCont
+            table.appendChild(tableWrap)
+
+            // handle textarea
+            const textArea = tableWrap.querySelector('.table__right')
+            textArea.value = value.text
+            textArea.addEventListener('input', e => {
+                e.currentTarget.parentNode.querySelector('.update').classList.add('update-show')
+            })
+
+            saveOnEnter(textArea, key, name)
+
+            handleClick(tableWrap.querySelector('.expand'), () => {
+                window.location.search = `key=${key}&name=${name}`
+            })
+        }
+    }
+
+    handleClick(document.querySelectorAll('.remove'), e => {
+        const elem = e.currentTarget
+        const key = elem.getAttribute('data-key')
+        chrome.storage.sync.get(['data'], resp => {
+            let newData = resp.data
+            delete newData[key]
+            chrome.storage.sync.set({ data: newData }, () => {
+                confirmChanges()
+                elem.parentNode.remove()
             })
         })
     })
+
+    handleClick(document.querySelectorAll('.update'), e => {
+        const elem = e.currentTarget
+        const key = elem.getAttribute('data-key')
+        const newVal = elem.parentNode.querySelector('.table__right').value
+        chrome.storage.sync.get(['data'], resp => {
+            const newData = { ...resp.data, [key]: { ...resp.data[key], text: newVal } }
+            chrome.storage.sync.set({ data: newData }, () => {
+                confirmChanges()
+                elem.parentNode.querySelector('.update').classList.remove('update-show')
+            })
+        })
+    })
+}
 
 document.querySelector('.search__input').addEventListener('keyup', e => {
     const query = e.target.value
@@ -221,13 +241,13 @@ handleClick(closeInfo, e => {
     })
 })
 
-chrome.storage.sync.get(['optionsState'], resp => {
-    const { optionsState } = resp
-
-    if (!optionsState.infoClosed) {
-        document.querySelector('.section__info').classList.add('section__info-display')
-    }
-})
+// chrome.storage.sync.get(['optionsState'], resp => {
+//     const { optionsState } = resp
+//
+//     if (!optionsState.infoClosed) {
+//         document.querySelector('.section__info').classList.add('section__info-display')
+//     }
+// })
 
 handleClick(expand, () => {
     const section = e.currentTarget.parentNode.parentNode
