@@ -1,21 +1,15 @@
 chrome.runtime.onInstalled.addListener(details => {
     if (details.reason == 'install') {
-        chrome.storage.sync.get(['data'], resp => {
-            // console.log(resp.data)
-            if (!resp.data) {
+        chrome.storage.sync.get(['it_1'], resp => {
+            console.log(resp.data)
+            if (!resp.it_1) {
                 chrome.storage.sync.set({
-                    data_1: {},
-                    appState: {
-                        currentChunk: 'data_1'
-                    },
-                    optionsState: {
-                        infoClosed: false
-                    }
+                    it_1: {}
                 })
             }
         })
     } else if (details.reason == 'update') {
-        chrome.storage.sync.clear()
+        // chrome.storage.sync.clear()
         // chrome.storage.sync.get(['data'], resp => {
         //     console.log(resp.data)
         //     // if (resp.data) {
@@ -25,12 +19,13 @@ chrome.runtime.onInstalled.addListener(details => {
         // chrome.storage.sync.getBytesInUse(['data'], resp => {
         //     console.log('data: ', resp)
         // })
-        // chrome.storage.sync.getBytesInUse(null, resp => {
-        //     console.log('all: ', resp)
-        // })
-        // chrome.storage.sync.get(null, resp => {
-        //     console.log(resp)
-        // })
+        chrome.storage.sync.getBytesInUse(null, resp => {
+            console.log('all: ', resp)
+        })
+        chrome.storage.sync.get(null, resp => {
+            console.log(resp)
+        })
+        console.log(chrome.storage.sync)
     }
 })
 
@@ -59,8 +54,6 @@ function syncStore(key, objectToStore, callback) {
         maxBytesPerItem = chrome.storage.sync.QUOTA_BYTES_PER_ITEM,
         maxValueBytes, index, segment, counter;
 
-    console.log("jsonstr length is " + lengthInUtf8Bytes(jsonstr));
-
     while (jsonstr.length > 0) {
         index = key + "_" + i++;
         maxValueBytes = maxBytesPerItem - lengthInUtf8Bytes(index);
@@ -75,11 +68,9 @@ function syncStore(key, objectToStore, callback) {
     }
 
     storageObj[key] = i;
-    console.log((i + 1) + " keys used (= key + key_i)");
 
     chrome.storage.sync.clear(function(){
         console.log(storageObj);
-        console.log(chrome.storage.sync);
         chrome.storage.sync.set(storageObj, callback);
     });
 }

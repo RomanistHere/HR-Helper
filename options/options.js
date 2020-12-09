@@ -27,24 +27,76 @@ const objFilter = (obj, condition) => {
     return newObj
 }
 
+const showErrMess = warning =>
+    alert(warning)
+
+const lengthInUtf8Bytes = (str) => {
+    const m = encodeURIComponent(str).match(/%[89ABab]/g)
+    return str.length + (m ? m.length : 0)
+}
+
+const syncStore = (key, objectToStore, oldData, callback) => {
+    let jsonstr = JSON.stringify(objectToStore), i = 0, storageObj = {},
+        maxBytesPerItem = chrome.storage.sync.QUOTA_BYTES_PER_ITEM,
+        maxValueBytes, index, segment, counter
+
+    while (jsonstr.length > 0) {
+        index = key + "_" + i++
+        maxValueBytes = maxBytesPerItem - lengthInUtf8Bytes(index)
+
+        counter = maxValueBytes
+        segment = jsonstr.substr(0, counter)
+        while ((lengthInUtf8Bytes(JSON.stringify(segment)) + key.length) > maxValueBytes)
+            segment = jsonstr.substr(0, --counter)
+
+        storageObj[index] = segment
+        jsonstr = jsonstr.substr(counter)
+    }
+
+    storageObj[key] = i
+
+    chrome.storage.sync.clear(() => {
+        chrome.storage.sync.set(storageObj, () => {
+			if (chrome.runtime.lastError) {
+				console.log(chrome.runtime.lastError.message)
+				showErrMess('Sorry, something is wrong')
+				syncStore('it', oldData, {}, () => {})
+				return
+			}
+            confirmChanges()
+			callback()
+		})
+    })
+}
+
 const confirmChanges = () => {
     savedNotif.classList.add('saved-show')
     setTimeout(() => { savedNotif.classList.remove('saved-show') }, 3000)
 }
 
-const saveChanges = (key, newText, name) =>
-    chrome.storage.sync.get(['data'], resp => {
-        const newData = {
-            ...resp.data,
-            [key]: {
-                text: newText,
-                marked: false,
-                itemName: getName(name),
-                date: new Date().toLocaleDateString()
-            }
+const saveChanges = async (key, newText, name = null, callback = () => {}) => {
+    const data = await getData()
+
+    const newData = {
+        ...data,
+        [key]: {
+            text: newText,
+            marked: false,
+            itemName: name ? getName(name) : data[key]['itemName'] ? data[key]['itemName'] : 'Nameless',
+            date: new Date().toLocaleDateString()
         }
-        chrome.storage.sync.set({ data: newData }, confirmChanges)
-    })
+    }
+
+    syncStore('it', newData, data, callback)
+}
+
+const removeAndSave = async (key, callback = () => {}) => {
+    let data = await getData()
+
+    delete data[key]
+
+    syncStore('it', data, data, callback)
+}
 
 const handleClick = (elem, func) => {
     if (elem.length == null) {
@@ -71,8 +123,13 @@ const saveOnEnter = (textArea, key, name) => {
     textArea.addEventListener('keydown', e => {
         if (e.keyCode === 13 && e.ctrlKey) {
             const newText = textArea.value
-            saveChanges(key, newText, name)
-            textArea.parentNode.querySelector('.update').classList.remove('update-show')
+            saveChanges(key, newText, name, () => {
+                try {
+                    textArea.parentNode.querySelector('.update').classList.remove('update-show')
+                } catch (e) {
+                    console.log(e)
+                }
+            })
         }
     })
 }
@@ -94,7 +151,12 @@ const getData = async () => {
     Object.values(resp).forEach(item => {
         string = string + item
     })
+
     console.log(string)
+    if (string.length === 0) {
+		return {}
+	}
+
     const obj = JSON.parse(string)
     console.log(obj)
     return obj
@@ -187,26 +249,18 @@ const loadData = async (queryArr) => {
     handleClick(document.querySelectorAll('.remove'), e => {
         const elem = e.currentTarget
         const key = elem.getAttribute('data-key')
-        chrome.storage.sync.get(['data'], resp => {
-            let newData = resp.data
-            delete newData[key]
-            chrome.storage.sync.set({ data: newData }, () => {
-                confirmChanges()
-                elem.parentNode.remove()
-            })
+        removeAndSave(key, () => {
+            confirmChanges()
+            elem.parentNode.remove()
         })
     })
 
     handleClick(document.querySelectorAll('.update'), e => {
         const elem = e.currentTarget
         const key = elem.getAttribute('data-key')
-        const newVal = elem.parentNode.querySelector('.table__right').value
-        chrome.storage.sync.get(['data'], resp => {
-            const newData = { ...resp.data, [key]: { ...resp.data[key], text: newVal } }
-            chrome.storage.sync.set({ data: newData }, () => {
-                confirmChanges()
-                elem.parentNode.querySelector('.update').classList.remove('update-show')
-            })
+        const newText = elem.parentNode.querySelector('.table__right').value
+        saveChanges(key, newText, null, () => {
+            elem.parentNode.querySelector('.update').classList.remove('update-show')
         })
     })
 }
@@ -230,16 +284,16 @@ const popup = document.querySelector('.popup')
 const closeInfo = document.querySelector('.section__info-close')
 const savedNotif = document.querySelector('.saved')
 
-handleClick(closeInfo, e => {
-    e.currentTarget.parentNode.classList.remove('section__info-show')
-    e.currentTarget.parentNode.classList.remove('section__info-display')
-
-    chrome.storage.sync.set({
-        optionsState: {
-            infoClosed: true
-        }
-    })
-})
+// handleClick(closeInfo, e => {
+//     e.currentTarget.parentNode.classList.remove('section__info-show')
+//     e.currentTarget.parentNode.classList.remove('section__info-display')
+//
+//     chrome.storage.sync.set({
+//         optionsState: {
+//             infoClosed: true
+//         }
+//     })
+// })
 
 // chrome.storage.sync.get(['optionsState'], resp => {
 //     const { optionsState } = resp
@@ -259,14 +313,13 @@ const firePopUp = (marked) => {
     const deleteBtn = popup.querySelector('.delete')
     const notDeleteBtn = popup.querySelector('.notDelete')
 
-    const handleDel = e => {
+    const handleDel = async (e) => {
         e.preventDefault()
 
-        chrome.storage.sync.get(['data'], resp => {
-            const newData = objFilter(resp.data, (value) => value.marked === marked)
-            chrome.storage.sync.set({ data: newData }, confirmChanges)
-        })
+        const data = await getData()
+        const newData = objFilter(data, value => value.marked === marked)
 
+        syncStore('it', newData, data, confirmChanges)
         window.location.reload()
     }
 
@@ -291,7 +344,7 @@ handleClick(clear, (e) => {
 loadData()
 
 // EXPAND //
-const initExpand = () => {
+const initExpand = async () => {
     const query = window.location.search.slice(1)
     if (query.length === 0)
         return
@@ -309,16 +362,10 @@ const initExpand = () => {
     nameLink.href = `${nameLink.href}${key}/`
     nameLink.innerText = getName(name)
     // set text if saved
-    chrome.storage.sync.get(['data'], resp => {
-        if (!resp.data)
-            return
-
-        const { data } = resp
-
-        if (data[key]) {
-            textArea.value = data[key].text ? data[key].text : ''
-        }
-    })
+    const data = await getData()
+    if (data[key]) {
+        textArea.value = data[key].text ? data[key].text : ''
+    }
 
     // show expanded menu
     expanded.classList.add('expanded-show')
@@ -333,13 +380,9 @@ const initExpand = () => {
     })
 
     handleClick(removeBtn, () => {
-        chrome.storage.sync.get(['data'], resp => {
-            let newData = resp.data
-            delete newData[key]
-            chrome.storage.sync.set({ data: newData }, () => {
-                confirmChanges()
-                textArea.value = ''
-            })
+        removeAndSave(key, () => {
+            confirmChanges()
+            textArea.value = ''
         })
     })
 

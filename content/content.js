@@ -173,6 +173,7 @@ const getData = async () => {
         string = string + item
     })
 
+	console.log(string)
 	if (string.length === 0) {
 		return {}
 	}
@@ -227,7 +228,7 @@ const syncStore = (key, objectToStore, oldData, callback) => {
 }
 
 const getName = string => {
-	console.log(string)
+	// console.log(string)
 	const newString = string.replace('Expand', '')
 		.replace('Status is online', '')
 		.replace('Status is offline', '')
@@ -269,7 +270,10 @@ const saveChanges = (e, url, textArea, formWrap, item) => {
         itemName: name
     }
 
-    saveToStorage(newUrl, newItem, item)
+    saveToStorage(newUrl, newItem, item, () => {
+		const savedNotif = item.querySelector('.RomanistHere__saved')
+		confirmChanges(savedNotif)
+	})
     closeForm(e, item, formWrap, true)
 }
 
