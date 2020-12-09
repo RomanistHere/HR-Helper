@@ -173,7 +173,6 @@ const getData = async () => {
         string = string + item
     })
 
-	console.log(string)
 	if (string.length === 0) {
 		return {}
 	}
@@ -247,7 +246,7 @@ const getName = string => {
 		.split(' ')
 		.slice(0, 2)
 		.join(' ')
-	console.log(newString)
+	// console.log(newString)
 	return newString
 }
 
@@ -463,4 +462,11 @@ const domObserver = new MutationObserver(mutations => {
 domObserver.observe(document.documentElement, {
     childList: true,
     subtree: true
+})
+
+// handle update from other sources
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+	if (request === 'updated') {
+		debUpdInfo()
+	}
 })

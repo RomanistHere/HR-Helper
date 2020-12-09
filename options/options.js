@@ -30,6 +30,16 @@ const objFilter = (obj, condition) => {
 const showErrMess = warning =>
     alert(warning)
 
+const defCallBack = () => {
+    chrome.tabs.query({ url: null }, resp => {
+        Object.values(resp).forEach(item => {
+            chrome.tabs.sendMessage(item.id, 'updated')
+        })
+    })
+}
+
+defCallBack()
+
 const lengthInUtf8Bytes = (str) => {
     const m = encodeURIComponent(str).match(/%[89ABab]/g)
     return str.length + (m ? m.length : 0)
@@ -71,6 +81,7 @@ const syncStore = (key, objectToStore, oldData, callback) => {
 
 const confirmChanges = () => {
     savedNotif.classList.add('saved-show')
+    defCallBack()
     setTimeout(() => { savedNotif.classList.remove('saved-show') }, 3000)
 }
 
@@ -152,13 +163,11 @@ const getData = async () => {
         string = string + item
     })
 
-    console.log(string)
     if (string.length === 0) {
 		return {}
 	}
 
     const obj = JSON.parse(string)
-    console.log(obj)
     return obj
 }
 
@@ -273,7 +282,6 @@ document.querySelector('.search__input').addEventListener('keyup', e => {
         .filter(item => item.length > 0)
         .filter(item => item !== 'AND' && item !== '||')
         .map(item => item.toLowerCase())
-    console.log(queryArr)
 
     loadData(queryArr.length ? queryArr : null)
 })

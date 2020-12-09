@@ -1,7 +1,6 @@
 chrome.runtime.onInstalled.addListener(details => {
     if (details.reason == 'install') {
         chrome.storage.sync.get(['it_1'], resp => {
-            console.log(resp.data)
             if (!resp.it_1) {
                 chrome.storage.sync.set({
                     it_1: {}
@@ -10,22 +9,18 @@ chrome.runtime.onInstalled.addListener(details => {
         })
     } else if (details.reason == 'update') {
         // chrome.storage.sync.clear()
-        // chrome.storage.sync.get(['data'], resp => {
-        //     console.log(resp.data)
-        //     // if (resp.data) {
-        //     //     syncStore('it', { ...resp.data}, () => console.log('success'))
-        //     // }
-        // })
-        // chrome.storage.sync.getBytesInUse(['data'], resp => {
-        //     console.log('data: ', resp)
-        // })
-        chrome.storage.sync.getBytesInUse(null, resp => {
-            console.log('all: ', resp)
+        chrome.storage.sync.get(['data'], resp => {
+            console.log(resp.data)
+            if (resp.data) {
+                syncStore('it', { ...resp.data}, () => {
+                    console.log('success')
+                    chrome.storage.sync.get(null, resp => {
+                        console.log(resp)
+                    })
+                })
+            }
         })
-        chrome.storage.sync.get(null, resp => {
-            console.log(resp)
-        })
-        console.log(chrome.storage.sync)
+
     }
 })
 
@@ -70,7 +65,6 @@ function syncStore(key, objectToStore, callback) {
     storageObj[key] = i;
 
     chrome.storage.sync.clear(function(){
-        console.log(storageObj);
         chrome.storage.sync.set(storageObj, callback);
     });
 }
