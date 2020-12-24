@@ -491,8 +491,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 		debUpdInfo()
 	}
 	// from popup
-	if (request.shouldWork != null) {
-		request.shouldWork ? startUpd() : removeAll()
+	if (request.notesShouldWork != null) {
+		request.notesShouldWork ? startUpd() : removeAll()
 	}
 
 	return true

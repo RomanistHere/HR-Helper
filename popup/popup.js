@@ -9,7 +9,7 @@ const messBtn = document.querySelector('.popup_mess')
 
 const configNotes = (shouldWork) => {
     chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
-        chrome.tabs.sendMessage(tabs[0].id, { shouldWork: shouldWork }, resp => {
+        chrome.tabs.sendMessage(tabs[0].id, { notesShouldWork: shouldWork }, resp => {
             // if (resp && resp.closePopup === true) {
             // }
         })

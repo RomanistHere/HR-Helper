@@ -194,3 +194,36 @@
 .comments-post-meta__actor {
     max-width: 300px !important;
 }
+
+/* // messages // */
+.RomanistHere__mess_wrap {
+    position: fixed;
+    z-index: 100000000;
+
+    padding: 10px;
+    width: 300px;
+    top: 50%;
+    right: 0;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+
+    background-color: var(--bg-col2);
+}
+
+.RomanistHere__message_links_wrap {
+    display: -webkit-flex;
+    display: -ms-flex;
+    display: flex;
+    justify-content: space-between;
+}
+
+.RomanistHere__message_btn {
+    padding: 2px 4px;
+
+    text-decoration: none;
+}
+
+.RomanistHere__message_textarea {
+    width: 100%;
+}
