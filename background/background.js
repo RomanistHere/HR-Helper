@@ -12,7 +12,7 @@ chrome.runtime.onInstalled.addListener(details => {
         chrome.storage.sync.get(['data'], resp => {
             console.log(resp.data)
             if (resp.data) {
-                syncStore('it', { ...resp.data}, () => {
+                syncStore('it', { ...resp.data }, () => {
                     console.log('success')
                     chrome.storage.sync.get(null, resp => {
                         console.log(resp)

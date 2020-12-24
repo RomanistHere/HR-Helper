@@ -399,6 +399,7 @@ const updInfo = async () => {
 		&& !link.href.includes('/linkedin/')
 		&& !link.href.includes('/#')
 		&& !link.href.includes('/edit/')
+		&& !link.href.includes('/opportunities/')
 		&& !link.href.includes('/detail')
 		&& !link.href.includes('/?lipi=urn')
 		&& !link.href.includes('/?mini')
