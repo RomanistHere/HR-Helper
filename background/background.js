@@ -1,4 +1,22 @@
-chrome.runtime.onInstalled.addListener(details => {
+const getStorageDataLocal = key =>
+	new Promise((resolve, reject) =>
+		chrome.storage.local.get(key, result =>
+			chrome.runtime.lastError
+				? reject(Error(chrome.runtime.lastError.message))
+				: resolve(result)
+		)
+	)
+
+const setStorageDataLocal = data =>
+	new Promise((resolve, reject) =>
+		chrome.storage.local.set(data, () =>
+			chrome.runtime.lastError
+				? reject(Error(chrome.runtime.lastError.message))
+				: resolve()
+		)
+	)
+
+chrome.runtime.onInstalled.addListener(async (details) => {
     if (details.reason == 'install') {
         chrome.storage.sync.get(['it_1'], resp => {
             if (!resp.it_1) {
@@ -21,6 +39,11 @@ chrome.runtime.onInstalled.addListener(details => {
             }
         })
 
+        await setStorageDataLocal({
+            note1: 'Hi, welcome to quick answers!',
+            note2: 'There are three (for now) editable notes. No need? Open the extension icon at top.',
+            note3: 'To make use of it drag the note to the message field.',
+        })
     }
 })
 

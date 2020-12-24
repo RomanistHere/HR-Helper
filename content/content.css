@@ -253,6 +253,34 @@
     text-decoration: none;
 }
 
+.RomanistHere__message_text_span,
+.RomanistHere__message_text_span:focus,
+.RomanistHere__message_text_span:hover {
+    display: block;
+    padding: 4px;
+
+    text-decoration: none;
+    color: #000 !important;
+    font-size: 15px;
+
+    cursor: move;
+    background-color: #eaeaea;
+    /* background-color: var(--sec-bg-col); */
+    border-radius: 4px;
+}
+
+.RomanistHere__message_text_span-hide {
+    display: none;
+}
+
 .RomanistHere__message_textarea {
-    width: 100%;
+    display: none;
+}
+
+.RomanistHere__message_textarea-visible {
+    display: block;
+}
+
+.RomanistHere__message {
+    margin: 10px 0;
 }
