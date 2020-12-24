@@ -3,6 +3,7 @@
     --bg-col2: #f9fafb;
     --bg-col1: #fff;
     --cross-col: #ca2424;
+    --sec-bg-col: #d2f4ff;
 }
 
 .RomanistHere__header {
@@ -204,11 +205,39 @@
     width: 300px;
     top: 50%;
     right: 0;
+    transform: translateY(-50%) translateX(85%);
+
+    background-color: var(--bg-col2);
+    -webkit-transition: all ease-out .5s;
+    -o-transition: all ease-out .5s;
+    transition: all ease-out .5s;
+}
+
+.RomanistHere__mess_wrap-active {
+    transform: translateY(-50%);
+}
+
+.RomanistHere__show_btn {
+    position: absolute;
+
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    width: 50px;
+    height: 80px;
+    left: -50px;
+    top: 50%;
     -webkit-transform: translateY(-50%);
     -ms-transform: translateY(-50%);
     transform: translateY(-50%);
+    border-radius: 40px 0 0 40px;
+    padding-right: 5px;
 
     background-color: var(--bg-col2);
+    border-left: 6px solid var(--sec-bg-col);
+
+    font-size: 14px;
 }
 
 .RomanistHere__message_links_wrap {
