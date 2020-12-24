@@ -7,6 +7,15 @@ const optBtn = document.querySelector('.popup_opt')
 const notesBtn = document.querySelector('.popup_notes')
 const messBtn = document.querySelector('.popup_mess')
 
+const configNotes = (shouldWork) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
+        chrome.tabs.sendMessage(tabs[0].id, { shouldWork: shouldWork }, resp => {
+            // if (resp && resp.closePopup === true) {
+            // }
+        })
+    })
+}
+
 const activateBtn = (parentNode) => {
     parentNode.querySelector('.button_toggle_text').textContent = 'Enable'
     parentNode.classList.add('popup__button-active')
@@ -33,8 +42,8 @@ const getData = async () => {
             messOn: messOn
         }
 
-        setBtn(notesBtn, state.notesOn)
-        setBtn(messBtn, state.messOn)
+        setBtn(notesBtn, !state.notesOn)
+        setBtn(messBtn, !state.messOn)
     })
 }
 
@@ -56,8 +65,8 @@ notesBtn.addEventListener('click', e => {
         notesOn: !state.notesOn,
     }
     // viz
-    setBtn(notesBtn, state.notesOn)
-    // removeNotes()
+    setBtn(notesBtn, !state.notesOn)
+    configNotes(state.notesOn)
 })
 
 messBtn.addEventListener('click', e => {
@@ -69,6 +78,6 @@ messBtn.addEventListener('click', e => {
         messOn: !state.messOn,
     }
     // viz
-    setBtn(messBtn, state.messOn)
+    setBtn(messBtn, !state.messOn)
     // removeMess()
 })

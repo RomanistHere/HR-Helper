@@ -452,7 +452,31 @@ const updInfo = async () => {
 	}
 }
 
-updInfo()
+const removeAll = () => {
+	domObserver.disconnect()
+	document.querySelectorAll('.RomanistHere__wrapper').forEach(item => item.remove())
+	if (document.querySelector('.RomanistHere__header')) {
+		document.querySelector('.RomanistHere__header').remove()
+		document.querySelector('.global-nav').classList.remove('RomanistHere-filled')
+	}
+}
+
+const startUpd = () => {
+	debUpdInfo()
+	domObserver.observe(document.documentElement, {
+	    childList: true,
+	    subtree: true
+	})
+}
+
+chrome.storage.local.get(['notesOn', 'messOn'], resp => {
+	const { notesOn, messOn } = resp
+
+	if (notesOn == null || notesOn === true) {
+		startUpd()
+		return
+	}
+})
 
 // handle Li update
 const debUpdInfo = debounce(updInfo, 300)
@@ -460,14 +484,16 @@ const domObserver = new MutationObserver(mutations => {
     debUpdInfo()
 })
 
-domObserver.observe(document.documentElement, {
-    childList: true,
-    subtree: true
-})
-
 // handle update from other sources
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+	// from options
 	if (request === 'updated') {
 		debUpdInfo()
 	}
+	// from popup
+	if (request.shouldWork != null) {
+		request.shouldWork ? startUpd() : removeAll()
+	}
+
+	return true
 })
