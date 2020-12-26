@@ -39,12 +39,39 @@ chrome.runtime.onInstalled.addListener(async (details) => {
             }
         })
 
+		// chrome.storage.sync.get(null, resp =>{
+		// 	console.log(resp)
+		// })
+		//
+		// const items = await getStorageDataLocal(null)
+		// console.log(items)
+
         await setStorageDataLocal({
             note1: 'Hi, welcome to quick answers!',
-            note2: 'There are three (for now) editable notes. No need? Open the extension icon at top.',
+            note2: 'There are three (for now) editable notes. No need? Open the extension icon at top and disable it.',
             note3: 'To make use of it drag the note to the message field.',
+			notesOn: true,
+			messOn: true
         })
     }
+
+	chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
+		// With a new rule ...
+		chrome.declarativeContent.onPageChanged.addRules([
+			{
+				// That fires when a page's URL contains a 'g' ...
+				conditions: [
+					new chrome.declarativeContent.PageStateMatcher({
+						pageUrl: {
+							hostEquals: 'www.linkedin.com'
+						},
+					})
+				],
+				// And shows the extension's page action.
+				actions: [ new chrome.declarativeContent.ShowPageAction() ]
+			}
+		])
+	})
 })
 
 // handle open option page request from "expand"

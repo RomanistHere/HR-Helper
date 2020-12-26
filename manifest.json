@@ -6,7 +6,8 @@
 	"permissions": [
 		"https://www.linkedin.com/*",
 		"storage",
-		"unlimitedStorage"
+		"unlimitedStorage",
+		"declarativeContent"
 	],
 	"content_scripts": [
 		{
@@ -24,7 +25,7 @@
 	"background": {
 		"page": "background/background.html"
 	},
-	"browser_action": {
+	"page_action": {
 		"default_popup": "popup/popup.html",
 		"default_title": "HR-helper - Click to open",
 		"default_icon": {
