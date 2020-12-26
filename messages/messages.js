@@ -33,8 +33,24 @@ const addMechanics = (div, text, storedNote) => {
     const textItem = div.querySelector('.RomanistHere__message_text_span')
     const deleteItem = div.querySelector('.RomanistHere__message_remove')
 
+	const save = async (newText) => {
+		textArea.classList.remove('RomanistHere__message_textarea-visible')
+        textItem.classList.remove('RomanistHere__message_text_span-hide')
+
+        addMechanics(div, newText, storedNote)
+        const objToSave = { [storedNote]: newText }
+        await setStorageDataLocal(objToSave)
+	}
+
     textItem.addEventListener('click', e => {
         e.preventDefault()
+    })
+
+	textArea.addEventListener('keydown', e => {
+        if (e.keyCode === 13 && e.ctrlKey) {
+			const newText = textArea.value
+            save(newText)
+        }
     })
 
     div.querySelector('.RomanistHere__message_edit').addEventListener('click', e => {
@@ -44,24 +60,16 @@ const addMechanics = (div, text, storedNote) => {
         textItem.classList.add('RomanistHere__message_text_span-hide')
     })
 
-    div.querySelector('.RomanistHere__message_save').addEventListener('click', async (e) => {
+    div.querySelector('.RomanistHere__message_save').addEventListener('click', e => {
         e.preventDefault()
-        textArea.classList.remove('RomanistHere__message_textarea-visible')
-        textItem.classList.remove('RomanistHere__message_text_span-hide')
-
-        const newText = textArea.value
-        addMechanics(div, newText, storedNote)
-        const objToSave = { [storedNote]: newText }
-        await setStorageDataLocal(objToSave)
+		const newText = textArea.value
+        save(newText)
     })
 
-    deleteItem.addEventListener('click', async (e) => {
+    deleteItem.addEventListener('click', e => {
         e.preventDefault()
         // div.remove()
-		const newText = ''
-        addMechanics(div, newText, storedNote)
-        const objToSave = { [storedNote]: newText }
-        await setStorageDataLocal(objToSave)
+		save('')
     })
 }
 
