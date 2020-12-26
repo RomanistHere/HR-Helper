@@ -479,9 +479,11 @@ chrome.storage.local.get(['notesOn', 'messOn'], resp => {
 })
 
 // handle Li update
+const debInitMessTempl = debounce(initMessTempl, 300)
 const debUpdInfo = debounce(updInfo, 300)
 const domObserver = new MutationObserver(mutations => {
     debUpdInfo()
+	debInitMessTempl()
 })
 
 // handle update from other sources

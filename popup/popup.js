@@ -16,6 +16,15 @@ const configNotes = (shouldWork) => {
     })
 }
 
+const configMessages = (shouldWork) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
+        chrome.tabs.sendMessage(tabs[0].id, { messagesShouldWork: shouldWork }, resp => {
+            // if (resp && resp.closePopup === true) {
+            // }
+        })
+    })
+}
+
 const activateBtn = (parentNode) => {
     parentNode.querySelector('.button_toggle_text').textContent = 'Enable'
     parentNode.classList.add('popup__button-active')
@@ -79,5 +88,5 @@ messBtn.addEventListener('click', e => {
     }
     // viz
     setBtn(messBtn, !state.messOn)
-    // removeMess()
+    configMessages(state.messOn)
 })

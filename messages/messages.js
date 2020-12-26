@@ -20,7 +20,7 @@ const messTempl = (text) =>
     `<div class="RomanistHere__message_links_wrap">
         <a href="#" class="RomanistHere__message_btn RomanistHere__message_edit">Edit</a>
         <a href="#" class="RomanistHere__message_btn RomanistHere__message_save">Save</a>
-        <a href="#" class="RomanistHere__message_btn RomanistHere__message_remove">Delete</a>
+        <a href="#" class="RomanistHere__message_btn RomanistHere__message_remove">Clear</a>
     </div>
     <textarea href="#" class="RomanistHere__message_textarea">${text}</textarea>
     <a href="#" class="RomanistHere__message_text_span">${text}</a>`
@@ -39,6 +39,7 @@ const addMechanics = (div, text, storedNote) => {
 
     div.querySelector('.RomanistHere__message_edit').addEventListener('click', e => {
         e.preventDefault()
+		document.querySelector('.RomanistHere__mess_wrap').classList.add('RomanistHere__mess_wrap-active')
         textArea.classList.add('RomanistHere__message_textarea-visible')
         textItem.classList.add('RomanistHere__message_text_span-hide')
     })
@@ -54,9 +55,13 @@ const addMechanics = (div, text, storedNote) => {
         await setStorageDataLocal(objToSave)
     })
 
-    deleteItem.addEventListener('click', e => {
+    deleteItem.addEventListener('click', async (e) => {
         e.preventDefault()
-        div.remove()
+        // div.remove()
+		const newText = ''
+        addMechanics(div, newText, storedNote)
+        const objToSave = { [storedNote]: newText }
+        await setStorageDataLocal(objToSave)
     })
 }
 
@@ -90,10 +95,14 @@ const getMessWrapTempl = () => {
 }
 
 const removeMess = () => {
-    document.querySelector('.RomanistHere__mess_wrap').remove()
+    document.querySelector('.RomanistHere__mess_wrap')?.remove()
 }
 
 const showTempl = async () => {
+	if (document.querySelector('.RomanistHere__mess_wrap')) {
+		return
+	}
+
     const wrap = getMessWrapTempl()
 
     const messTempl1 = await getMessTempl('note1')
@@ -109,8 +118,13 @@ const showTempl = async () => {
 
 const initMessTempl = () => {
     if (!window.location.href.includes('linkedin.com/messaging/thread')) {
+		removeMess()
         return
     }
+
+	if (document.querySelector('.RomanistHere__mess_wrap')) {
+		return
+	}
 
     chrome.storage.local.get('messOn', resp => {
     	const { messOn } = resp

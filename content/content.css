@@ -257,16 +257,19 @@
 .RomanistHere__message_text_span:focus,
 .RomanistHere__message_text_span:hover {
     display: block;
+
     padding: 4px;
+    max-height: 150px;
+    border-radius: 4px;
 
     text-decoration: none;
     color: #000 !important;
     font-size: 15px;
 
     cursor: move;
+    overflow: hidden;
     background-color: #eaeaea;
     /* background-color: var(--sec-bg-col); */
-    border-radius: 4px;
 }
 
 .RomanistHere__message_text_span-hide {
@@ -275,6 +278,8 @@
 
 .RomanistHere__message_textarea {
     display: none;
+
+    height: 150px;
 }
 
 .RomanistHere__message_textarea-visible {
