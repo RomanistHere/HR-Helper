@@ -176,6 +176,7 @@ const loadData = async (queryArr) => {
         queryArr = []
 
     const data = await getData()
+    console.log(data)
 
     const table = document.querySelector('.table')
     const marked = document.querySelector('.marked')
@@ -187,7 +188,9 @@ const loadData = async (queryArr) => {
         const name = getName(value.itemName)
 
         // APPEND TO MARKED
-        if (value.marked && queryArr.every(item => name.toLowerCase().includes(item))) {
+        if (value.marked &&
+        (queryArr.every(item => name.toLowerCase().includes(item)) 
+        || queryArr.every(item => value.date.toLowerCase().includes(item)))) {
             const linksWrap = document.createElement('span')
             const link = linkTemplate(key, name)
 
@@ -232,6 +235,7 @@ const loadData = async (queryArr) => {
         // append to SAVED
         if (queryArr.every(item => key.toLowerCase().includes(item))
             || queryArr.every(item => name.toLowerCase().includes(item))
+            || queryArr.every(item => value.date.toLowerCase().includes(item))
             || queryArr.every(item => value.text.toLowerCase().includes(item))) {
             // create and append element
             const tableWrap = document.createElement('div')
