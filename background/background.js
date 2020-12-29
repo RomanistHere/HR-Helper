@@ -25,6 +25,14 @@ chrome.runtime.onInstalled.addListener(async (details) => {
                 })
             }
         })
+
+		await setStorageDataLocal({
+            note1: 'Hi, welcome to quick answers!',
+            note2: 'There are three (for now) editable notes. No need? Open the extension icon at top and disable it.',
+            note3: 'To make use of it drag the note to the message field.',
+			notesOn: true,
+			messOn: true
+        })
     } else if (details.reason == 'update') {
         // chrome.storage.sync.clear()
 		chrome.storage.sync.get(['it_1', 'it_2'], resp => {
@@ -41,14 +49,6 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 		//
 		// const items = await getStorageDataLocal(null)
 		// console.log(items)
-
-        await setStorageDataLocal({
-            note1: 'Hi, welcome to quick answers!',
-            note2: 'There are three (for now) editable notes. No need? Open the extension icon at top and disable it.',
-            note3: 'To make use of it drag the note to the message field.',
-			notesOn: true,
-			messOn: true
-        })
     }
 
 	chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
