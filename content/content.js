@@ -177,8 +177,13 @@ const getData = async () => {
 		return {}
 	}
 
-    const obj = JSON.parse(string)
-    return obj
+	try {
+	    const obj = JSON.parse(string)
+	    return obj
+	} catch (e) {
+		console.log(e)
+		showErrMess('Sorry, something is wrong, please pause or disable the extension and contact the developer.')
+	}
 }
 
 const saveToStorage = async (key, value, item, callback = () => {}) => {
