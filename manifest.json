@@ -1,7 +1,7 @@
 {
 	"name": "HR helper",
 	"short_name": "HR helper - Linkedin™ private notes",
-	"version": "0.1.16",
+	"version": "0.1.17",
 	"description": "Linkedin private notes",
 	"permissions": [
 		"https://www.linkedin.com/*",
