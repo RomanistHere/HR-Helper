@@ -28,7 +28,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     } else if (details.reason == 'update') {
         // chrome.storage.sync.clear()
 		chrome.storage.sync.get(['it_1', 'it_2'], resp => {
-            if (resp.it_1 && !resp.it_2) {
+            if (resp.it_1 && !resp.it_2 && Object.keys(resp.it_1).length === 0) {
                 chrome.storage.sync.set({
                     it_1: ''
                 })
