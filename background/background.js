@@ -21,20 +21,16 @@ chrome.runtime.onInstalled.addListener(async (details) => {
         chrome.storage.sync.get(['it_1'], resp => {
             if (!resp.it_1) {
                 chrome.storage.sync.set({
-                    it_1: ''
+					it_1: ''
                 })
             }
         })
     } else if (details.reason == 'update') {
         // chrome.storage.sync.clear()
-        chrome.storage.sync.get(['data'], resp => {
-            console.log(resp.data)
-            if (resp.data) {
-                syncStore('it', { ...resp.data }, () => {
-                    console.log('success')
-                    chrome.storage.sync.get(null, resp => {
-                        console.log(resp)
-                    })
+		chrome.storage.sync.get(['it_1', 'it_2'], resp => {
+            if (resp.it_1 && !resp.it_2) {
+                chrome.storage.sync.set({
+                    it_1: ''
                 })
             }
         })
