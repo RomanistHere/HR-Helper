@@ -17,7 +17,8 @@ const setStorageDataLocal = data =>
 	)
 
 chrome.runtime.onInstalled.addListener(async (details) => {
-    if (details.reason == 'install') {
+	const { previousVersion, reason } = details
+    if (reason == 'install') {
         chrome.storage.sync.get(['it_1'], resp => {
             if (!resp.it_1) {
                 chrome.storage.sync.set({
@@ -33,15 +34,19 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 			notesOn: true,
 			messOn: true
         })
-    } else if (details.reason == 'update') {
+    } else if (reason == 'update') {
         // chrome.storage.sync.clear()
-		chrome.storage.sync.get(['it_1', 'it_2'], resp => {
-            if (resp.it_1 && !resp.it_2 && Object.keys(resp.it_1).length === 0) {
-                chrome.storage.sync.set({
-                    it_1: ''
-                })
-            }
-        })
+		if (previousVersion === '0.1.16') {
+
+		} else {
+			chrome.storage.sync.get(['it_1', 'it_2'], resp => {
+	            if (resp.it_1 && !resp.it_2 && Object.keys(resp.it_1).length === 0) {
+	                chrome.storage.sync.set({
+	                    it_1: ''
+	                })
+	            }
+	        })
+		}
 
 		// chrome.storage.sync.get(null, resp =>{
 		// 	console.log(resp)

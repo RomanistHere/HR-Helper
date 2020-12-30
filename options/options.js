@@ -314,7 +314,7 @@ const savedNotif = document.querySelector('.saved')
 //     }
 // })
 
-handleClick(expand, () => {
+handleClick(expand, (e) => {
     const section = e.currentTarget.parentNode.parentNode
     section.classList.toggle('section-expand')
 })
